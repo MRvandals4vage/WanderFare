@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// Simple gradient descent implementation for price prediction
 class PricePredictionModel {
   private weights: number[]
   private learningRate: number
@@ -19,31 +18,27 @@ class PricePredictionModel {
     this.iterations = iterations
   }
 
-  // Normalize features
   private normalize(features: number[]): number[] {
     const maxValues = [12, 100, 5, 10] // Max values for each feature
     return features.map((feature, index) => feature / maxValues[index])
   }
 
-  // Predict price using linear regression
   predict(features: number[]): number {
     const normalizedFeatures = this.normalize(features)
     let prediction = this.weights[0] // bias term
     for (let i = 0; i < normalizedFeatures.length; i++) {
       prediction += this.weights[i + 1] * normalizedFeatures[i]
     }
-    return Math.max(5, Math.min(50, prediction * 20)) // Scale and bound between $5-$50
+    return Math.max(5, Math.min(50, prediction * 20))
   }
 
-  // Train the model with sample data
   train(): void {
-    // Sample training data: [month, demand, competition, ingredient_cost] -> price
     const trainingData = [
-      { features: [1, 80, 3, 8], price: 15 }, // January, high demand, medium competition, high ingredient cost
-      { features: [6, 95, 2, 6], price: 18 }, // June, very high demand, low competition, medium ingredient cost
-      { features: [12, 70, 4, 9], price: 14 }, // December, medium demand, high competition, high ingredient cost
-      { features: [3, 60, 3, 5], price: 12 }, // March, low demand, medium competition, low ingredient cost
-      { features: [7, 90, 1, 7], price: 22 }, // July, high demand, very low competition, medium-high ingredient cost
+      { features: [1, 80, 3, 8], price: 15 },
+      { features: [6, 95, 2, 6], price: 18 },
+      { features: [12, 70, 4, 9], price: 14 },
+      { features: [3, 60, 3, 5], price: 12 },
+      { features: [7, 90, 1, 7], price: 22 },
     ]
 
     for (let iter = 0; iter < this.iterations; iter++) {
@@ -52,8 +47,7 @@ class PricePredictionModel {
         const error = prediction - data.price
         const normalizedFeatures = this.normalize(data.features)
 
-        // Update weights using gradient descent
-        this.weights[0] -= this.learningRate * error // bias
+        this.weights[0] -= this.learningRate * error
         for (let i = 0; i < normalizedFeatures.length; i++) {
           this.weights[i + 1] -= this.learningRate * error * normalizedFeatures[i]
         }
@@ -111,7 +105,6 @@ export function PricePredictionPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Input Form */}
           <Card>
             <CardHeader>
               <CardTitle>Market Conditions</CardTitle>
@@ -188,7 +181,6 @@ export function PricePredictionPage() {
             </CardContent>
           </Card>
 
-          {/* Results */}
           <Card>
             <CardHeader>
               <CardTitle>Prediction Results</CardTitle>
@@ -240,7 +232,6 @@ export function PricePredictionPage() {
           </Card>
         </div>
 
-        {/* Model Explanation */}
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>How It Works</CardTitle>

@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
-// Mock order history data
 const orderHistory = [
   {
     id: "ORD-001",
@@ -83,7 +82,6 @@ export function HistoryPage() {
           <p className="text-xl text-muted-foreground">Track your past orders and experiences</p>
         </div>
 
-        {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-2">
@@ -109,7 +107,6 @@ export function HistoryPage() {
           </Card>
         </div>
 
-        {/* Order History List */}
         <div className="space-y-4">
           {orderHistory.map((order) => (
             <Card key={order.id} className="hover:shadow-md transition-shadow">
@@ -126,7 +123,6 @@ export function HistoryPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* Items */}
                   <div>
                     <h4 className="font-semibold mb-2">Items Ordered:</h4>
                     <ul className="text-muted-foreground space-y-1">
@@ -139,7 +135,6 @@ export function HistoryPage() {
                     </ul>
                   </div>
 
-                  {/* Footer */}
                   <div className="flex justify-between items-center pt-4 border-t border-border">
                     <div className="flex items-center space-x-4">
                       <span className="font-semibold text-lg">${order.total.toFixed(2)}</span>
@@ -163,7 +158,6 @@ export function HistoryPage() {
           ))}
         </div>
 
-        {/* Load More */}
         <div className="text-center mt-8">
           <Button variant="outline">Load More Orders</Button>
         </div>

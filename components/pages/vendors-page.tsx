@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 
-// Mock vendor data
 const foodVendors = [
   {
     id: 1,
@@ -81,7 +80,6 @@ export function VendorsPage() {
         <p className="text-sm text-muted-foreground">📍 {vendor.location}</p>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Embedded Google Maps */}
         <div className="w-full h-48 bg-muted rounded-lg overflow-hidden">
           <iframe
             src={`https://www.google.com/maps/embed?${vendor.mapEmbedId}`}
@@ -95,7 +93,6 @@ export function VendorsPage() {
           />
         </div>
 
-        {/* Products List */}
         <div>
           <h4 className="font-semibold mb-2">Popular Items:</h4>
           <div className="flex flex-wrap gap-2">
@@ -107,7 +104,6 @@ export function VendorsPage() {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex gap-2 pt-2">
           <Button className="flex-1">View Menu</Button>
           <Button variant="outline" className="flex-1 bg-transparent">

@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// Mock customer data
 const initialCustomers = [
   {
     id: 1,
@@ -110,7 +109,6 @@ export function ManageCustomersPage() {
           <p className="text-xl text-muted-foreground">Monitor and manage customer accounts and activity</p>
         </div>
 
-        {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-2">
@@ -144,7 +142,6 @@ export function ManageCustomersPage() {
           </Card>
         </div>
 
-        {/* Filters */}
         <Card className="mb-6">
           <CardHeader>
             <CardTitle>Filters</CardTitle>
@@ -173,7 +170,6 @@ export function ManageCustomersPage() {
           </CardContent>
         </Card>
 
-        {/* Customers List */}
         <Card>
           <CardHeader>
             <CardTitle>Customer List</CardTitle>

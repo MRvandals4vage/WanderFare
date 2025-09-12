@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
-// Mock dashboard data
 const dashboardStats = {
   totalVendors: 247,
   activeVendors: 189,
@@ -105,7 +104,6 @@ export function DashboardPage() {
           <p className="text-xl text-muted-foreground">Platform overview and key metrics</p>
         </div>
 
-        {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-2">
@@ -155,7 +153,6 @@ export function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Activity */}
           <Card>
             <CardHeader>
               <CardTitle>Recent Activity</CardTitle>
@@ -180,7 +177,6 @@ export function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Top Vendors */}
           <Card>
             <CardHeader>
               <CardTitle>Top Performing Vendors</CardTitle>
@@ -215,7 +211,6 @@ export function DashboardPage() {
           </Card>
         </div>
 
-        {/* Quick Actions */}
         <Card className="mt-8">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
