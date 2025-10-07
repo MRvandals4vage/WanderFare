@@ -2,8 +2,11 @@
 
 import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import type { PageType } from "@/app/page"
 import { useState } from "react"
+import { User, LogOut, Settings } from "lucide-react"
 
 interface NavbarProps {
   currentPage: PageType
@@ -11,13 +14,15 @@ interface NavbarProps {
 }
 
 export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
-  const { userRole, logout } = useAuth()
+  const { user, userRole, logout, isAuthenticated } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleLogout = () => {
     logout()
     setCurrentPage("home")
     setIsMobileMenuOpen(false)
+    // Force page reload to clear all state
+    window.location.href = "/"
   }
 
   const handleNavClick = (page: PageType) => {
@@ -26,7 +31,7 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
   }
 
   const getNavItems = () => {
-    if (!userRole) {
+    if (!isAuthenticated || !userRole) {
       return [
         { label: "Home", page: "home" as PageType },
         { label: "Login", page: "login" as PageType },
@@ -34,20 +39,20 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
     }
 
     switch (userRole) {
-      case "customer":
+      case "CUSTOMER":
         return [
           { label: "Home", page: "home" as PageType },
           { label: "Vendors", page: "vendors" as PageType },
           { label: "History", page: "history" as PageType },
         ]
-      case "vendor":
+      case "VENDOR":
         return [
           { label: "Home", page: "home" as PageType },
           { label: "Profile", page: "profile" as PageType },
           { label: "Price Prediction", page: "price-prediction" as PageType },
           { label: "Profits", page: "profits" as PageType },
         ]
-      case "admin":
+      case "ADMIN":
         return [
           { label: "Home", page: "home" as PageType },
           { label: "Dashboard", page: "dashboard" as PageType },
@@ -60,9 +65,10 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
   }
 
   const navItems = getNavItems()
+  const userInitials = user ? `${user.firstName[0]}${user.lastName[0]}` : "U"
 
   return (
-    <nav className="relative bg-background border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-background/95">
+    <nav className="bg-background/95 border-b border-border sticky top-0 z-50 backdrop-blur-sm">
       {/* Curved design using SVG path */}
       <div className="absolute inset-0 overflow-hidden">
         <svg
@@ -112,11 +118,56 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
             </div>
           </div>
 
-          {/* Logout Button */}
-          {userRole && (
+          {/* User Menu */}
+          {isAuthenticated && user ? (
+            <div className="hidden md:flex items-center gap-3">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {userInitials}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex items-center justify-start gap-2 p-2">
+                    <div className="flex flex-col space-y-1 leading-none">
+                      <p className="font-medium">{user.firstName} {user.lastName}</p>
+                      <p className="w-[200px] truncate text-sm text-muted-foreground">
+                        {user.email}
+                      </p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {userRole?.toLowerCase()}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => handleNavClick("profile")}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleNavClick("profile")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/* Always-visible Sign out button as a backup */}
+              <Button onClick={handleLogout} variant="outline" size="sm">
+                Sign out
+              </Button>
+            </div>
+          ) : (
             <div className="hidden md:block">
-              <Button onClick={handleLogout} variant="outline" size="sm" className="bg-transparent">
-                Logout
+              <Button onClick={() => handleNavClick("login")} variant="outline" size="sm">
+                Sign In
               </Button>
             </div>
           )}
@@ -145,6 +196,20 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
         {isMobileMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-border mt-2 bg-background/95 backdrop-blur-sm">
+              {isAuthenticated && user && (
+                <div className="flex items-center gap-2 p-3 mb-2 bg-muted rounded-md">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {userInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-medium text-sm">{user.firstName} {user.lastName}</p>
+                    <p className="text-xs text-muted-foreground">{userRole?.toLowerCase()}</p>
+                  </div>
+                </div>
+              )}
+              
               {navItems.map((item) => (
                 <button
                   key={item.page}
@@ -158,9 +223,15 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
                   {item.label}
                 </button>
               ))}
-              {userRole && (
-                <Button onClick={handleLogout} variant="outline" size="sm" className="w-full mt-2 bg-transparent">
+              
+              {isAuthenticated ? (
+                <Button onClick={handleLogout} variant="outline" size="sm" className="w-full mt-2">
+                  <LogOut className="mr-2 h-4 w-4" />
                   Logout
+                </Button>
+              ) : (
+                <Button onClick={() => handleNavClick("login")} variant="outline" size="sm" className="w-full mt-2">
+                  Sign In
                 </Button>
               )}
             </div>

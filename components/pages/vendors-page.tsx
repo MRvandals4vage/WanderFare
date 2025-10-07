@@ -1,112 +1,136 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-
-const foodVendors = [
-  {
-    id: 1,
-    name: "Mama's Kitchen",
-    description: "Authentic home-style cooking with love and tradition",
-    location: "Downtown Food Court",
-    rating: 4.8,
-    products: ["Chicken Curry", "Biryani", "Naan Bread", "Samosas"],
-    mapEmbedId:
-      "pb=!1m18!1m12!1m3!1d3022.1422937950147!2d-73.98731968482413!3d40.75889497932681!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1635959404065!5m2!1sen!2sus",
-  },
-  {
-    id: 2,
-    name: "Street Tacos Express",
-    description: "Fresh Mexican street food made with authentic ingredients",
-    location: "Central Park Area",
-    rating: 4.6,
-    products: ["Fish Tacos", "Carnitas", "Guacamole", "Churros"],
-    mapEmbedId:
-      "pb=!1m18!1m12!1m3!1d3022.1422937950147!2d-73.98731968482413!3d40.75889497932681!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1635959404065!5m2!1sen!2sus",
-  },
-  {
-    id: 3,
-    name: "Noodle Master",
-    description: "Hand-pulled noodles and traditional Asian soups",
-    location: "Chinatown District",
-    rating: 4.9,
-    products: ["Ramen", "Pho", "Dumplings", "Bao Buns"],
-    mapEmbedId:
-      "pb=!1m18!1m12!1m3!1d3022.1422937950147!2d-73.98731968482413!3d40.75889497932681!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1635959404065!5m2!1sen!2sus",
-  },
-]
-
-const ingredientVendors = [
-  {
-    id: 4,
-    name: "Fresh Farm Produce",
-    description: "Organic vegetables and fruits directly from local farms",
-    location: "Farmers Market",
-    rating: 4.7,
-    products: ["Organic Tomatoes", "Fresh Herbs", "Seasonal Fruits", "Root Vegetables"],
-    mapEmbedId:
-      "pb=!1m18!1m12!1m3!1d3022.1422937950147!2d-73.98731968482413!3d40.75889497932681!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1635959404065!5m2!1sen!2sus",
-  },
-  {
-    id: 5,
-    name: "Spice World",
-    description: "Premium spices and seasonings from around the globe",
-    location: "International Market",
-    rating: 4.5,
-    products: ["Exotic Spices", "Herb Blends", "Chili Powders", "Vanilla Beans"],
-    mapEmbedId:
-      "pb=!1m18!1m12!1m3!1d3022.1422937950147!2d-73.98731968482413!3d40.75889497932681!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1635959404065!5m2!1sen!2sus",
-  },
-]
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Loader2, Search, MapPin, Star, Clock, DollarSign } from "lucide-react"
+import { apiClient, Vendor } from "@/lib/api"
 
 export function VendorsPage() {
-  const [activeTab, setActiveTab] = useState("food")
+  const [vendors, setVendors] = useState<Vendor[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCity, setSelectedCity] = useState<string>("all")
+  const [selectedCuisine, setSelectedCuisine] = useState<string>("all")
+  const [sortBy, setSortBy] = useState<string>("rating")
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
 
-  const VendorCard = ({ vendor }: { vendor: (typeof foodVendors)[0] }) => (
-    <Card className="hover:shadow-lg transition-shadow">
+  // Get unique cities and cuisines for filters
+  const cities = [...new Set(vendors.map(v => v.city))].sort()
+  const cuisines = [...new Set(vendors.map(v => v.cuisineType))].sort()
+
+  const loadVendors = async () => {
+    try {
+      setLoading(true)
+      setError("")
+      
+      let response
+      if (searchTerm.trim()) {
+        response = await apiClient.searchVendors(searchTerm, currentPage, 12)
+      } else if (selectedCity !== "all" || selectedCuisine !== "all") {
+        const filters: any = { page: currentPage, size: 12 }
+        if (selectedCity !== "all") filters.city = selectedCity
+        if (selectedCuisine !== "all") filters.cuisineType = selectedCuisine
+        response = await apiClient.filterVendors(filters)
+      } else {
+        response = await apiClient.getVendors({
+          page: currentPage,
+          size: 12,
+          sortBy: sortBy,
+          sortDir: "desc"
+        })
+      }
+      
+      setVendors(response.content || [])
+      setTotalPages(response.totalPages || Math.ceil((response.content?.length || 0) / 12))
+    } catch (err: any) {
+      console.error("Failed to load vendors:", err)
+      setError("Failed to load vendors. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadVendors()
+  }, [currentPage, sortBy])
+
+  const handleSearch = () => {
+    setCurrentPage(0)
+    loadVendors()
+  }
+
+  const handleFilter = () => {
+    setCurrentPage(0)
+    loadVendors()
+  }
+
+  const formatTime = (time: string) => {
+    if (!time) return "N/A"
+    return time.slice(0, 5) // Remove seconds
+  }
+
+  const VendorCard = ({ vendor }: { vendor: Vendor }) => (
+    <Card className="hover:shadow-lg transition-shadow h-full">
       <CardHeader>
         <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-xl">{vendor.name}</CardTitle>
-            <CardDescription className="mt-1">{vendor.description}</CardDescription>
+          <div className="flex-1">
+            <CardTitle className="text-xl">{vendor.businessName}</CardTitle>
+            <CardDescription className="mt-1 line-clamp-2">
+              {vendor.description || "Delicious food awaits you!"}
+            </CardDescription>
           </div>
-          <Badge variant="secondary" className="bg-primary/10 text-primary">
-            ★ {vendor.rating}
+          <Badge variant="secondary" className="bg-primary/10 text-primary ml-2">
+            <Star className="w-3 h-3 mr-1" />
+            {vendor.rating?.toFixed(1) || "New"}
           </Badge>
         </div>
-        <p className="text-sm text-muted-foreground">📍 {vendor.location}</p>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="w-full h-48 bg-muted rounded-lg overflow-hidden">
-          <iframe
-            src={`https://www.google.com/maps/embed?${vendor.mapEmbedId}`}
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title={`${vendor.name} location`}
-          />
-        </div>
-
-        <div>
-          <h4 className="font-semibold mb-2">Popular Items:</h4>
-          <div className="flex flex-wrap gap-2">
-            {vendor.products.map((product, index) => (
-              <Badge key={index} variant="outline">
-                {product}
-              </Badge>
-            ))}
+        
+        <div className="space-y-1 text-sm text-muted-foreground">
+          <div className="flex items-center">
+            <MapPin className="w-4 h-4 mr-1" />
+            {vendor.city}
           </div>
+          <div className="flex items-center">
+            <Clock className="w-4 h-4 mr-1" />
+            {formatTime(vendor.openingTime)} - {formatTime(vendor.closingTime)}
+          </div>
+          <div className="flex items-center">
+            <DollarSign className="w-4 h-4 mr-1" />
+            Delivery: ${vendor.deliveryFee?.toFixed(2) || "0.00"}
+          </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="space-y-4">
+        <div>
+          <Badge variant="outline" className="mb-2">
+            {vendor.cuisineType || "Mixed"}
+          </Badge>
+          {vendor.isApproved && (
+            <Badge variant="default" className="ml-2 bg-green-100 text-green-800">
+              Verified
+            </Badge>
+          )}
         </div>
 
         <div className="flex gap-2 pt-2">
-          <Button className="flex-1">View Menu</Button>
-          <Button variant="outline" className="flex-1 bg-transparent">
+          <Button className="flex-1" onClick={() => {
+            // TODO: Navigate to vendor menu page
+            console.log("View menu for vendor:", vendor.id)
+          }}>
+            View Menu
+          </Button>
+          <Button variant="outline" className="flex-1" onClick={() => {
+            // TODO: Navigate to vendor reviews
+            console.log("View reviews for vendor:", vendor.id)
+          }}>
             Reviews
           </Button>
         </div>
@@ -120,36 +144,129 @@ export function VendorsPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-4">Discover Vendors</h1>
           <p className="text-xl text-muted-foreground">
-            Find amazing food vendors and ingredient suppliers in your area
+            Find amazing food vendors and explore authentic culinary experiences
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="food" className="text-lg py-3">
-              Food Vendors
-            </TabsTrigger>
-            <TabsTrigger value="ingredients" className="text-lg py-3">
-              Ingredient Suppliers
-            </TabsTrigger>
-          </TabsList>
+        {/* Search and Filters */}
+        <div className="mb-8 space-y-4">
+          <div className="flex gap-4 items-end">
+            <div className="flex-1">
+              <Input
+                placeholder="Search vendors..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
+            <Button onClick={handleSearch} disabled={loading}>
+              <Search className="w-4 h-4 mr-2" />
+              Search
+            </Button>
+          </div>
 
-          <TabsContent value="food" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {foodVendors.map((vendor) => (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Select value={selectedCity} onValueChange={setSelectedCity}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Cities" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cities</SelectItem>
+                {cities.map(city => (
+                  <SelectItem key={city} value={city}>{city}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedCuisine} onValueChange={setSelectedCuisine}>
+              <SelectTrigger>
+                <SelectValue placeholder="All Cuisines" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Cuisines</SelectItem>
+                {cuisines.map(cuisine => (
+                  <SelectItem key={cuisine} value={cuisine}>{cuisine}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="rating">Rating</SelectItem>
+                <SelectItem value="businessName">Name</SelectItem>
+                <SelectItem value="deliveryFee">Delivery Fee</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Button onClick={handleFilter} variant="outline" disabled={loading}>
+              Apply Filters
+            </Button>
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin" />
+            <span className="ml-2">Loading vendors...</span>
+          </div>
+        )}
+
+        {/* Vendors Grid */}
+        {!loading && vendors.length > 0 && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {vendors.map((vendor) => (
                 <VendorCard key={vendor.id} vendor={vendor} />
               ))}
             </div>
-          </TabsContent>
 
-          <TabsContent value="ingredients" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {ingredientVendors.map((vendor) => (
-                <VendorCard key={vendor.id} vendor={vendor} />
-              ))}
-            </div>
-          </TabsContent>
-        </Tabs>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center space-x-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                  disabled={currentPage === 0 || loading}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm text-muted-foreground">
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                  disabled={currentPage >= totalPages - 1 || loading}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* No Results */}
+        {!loading && vendors.length === 0 && (
+          <div className="text-center py-12">
+            <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+              No vendors found
+            </h3>
+            <p className="text-muted-foreground">
+              Try adjusting your search criteria or check back later for new vendors.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

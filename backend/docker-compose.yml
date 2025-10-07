@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # MySQL Database (for local development)
+  mysql:
+    image: mysql:8.0
+    container_name: wanderfare-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: wanderfare
+      MYSQL_USER: wanderfare_user
+      MYSQL_PASSWORD: wanderfare_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - wanderfare-network
+
+  # WanderFare Backend API
+  backend:
+    build: .
+    container_name: wanderfare-backend
+    environment:
+      DATABASE_URL: jdbc:mysql://mysql:3306/wanderfare?sslMode=DISABLED
+      DATABASE_USERNAME: wanderfare_user
+      DATABASE_PASSWORD: wanderfare_password
+      JWT_SECRET: mySecretKey123456789012345678901234567890
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - wanderfare-network
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mysql_data:
+
+networks:
+  wanderfare-network:
+    driver: bridge
