@@ -69,21 +69,49 @@ public class VendorService {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
-        // Update allowed fields
-        vendor.setBusinessName(vendorDto.getBusinessName());
-        vendor.setBusinessAddress(vendorDto.getBusinessAddress());
-        vendor.setCity(vendorDto.getCity());
-        vendor.setPostalCode(vendorDto.getPostalCode());
-        vendor.setCuisineType(vendorDto.getCuisineType());
-        vendor.setDescription(vendorDto.getDescription());
-        vendor.setOpeningTime(vendorDto.getOpeningTime());
-        vendor.setClosingTime(vendorDto.getClosingTime());
-        vendor.setMinimumOrder(vendorDto.getMinimumOrder());
-        vendor.setDeliveryFee(vendorDto.getDeliveryFee());
-        vendor.setImageUrl(vendorDto.getImageUrl());
-        vendor.setFirstName(vendorDto.getFirstName());
-        vendor.setLastName(vendorDto.getLastName());
-        vendor.setPhoneNumber(vendorDto.getPhoneNumber());
+        // Update allowed fields - only update if not null
+        if (vendorDto.getBusinessName() != null) {
+            vendor.setBusinessName(vendorDto.getBusinessName());
+        }
+        if (vendorDto.getBusinessAddress() != null) {
+            vendor.setBusinessAddress(vendorDto.getBusinessAddress());
+        }
+        if (vendorDto.getCity() != null) {
+            vendor.setCity(vendorDto.getCity());
+        }
+        if (vendorDto.getPostalCode() != null) {
+            vendor.setPostalCode(vendorDto.getPostalCode());
+        }
+        if (vendorDto.getCuisineType() != null) {
+            vendor.setCuisineType(vendorDto.getCuisineType());
+        }
+        if (vendorDto.getDescription() != null) {
+            vendor.setDescription(vendorDto.getDescription());
+        }
+        if (vendorDto.getOpeningTime() != null) {
+            vendor.setOpeningTime(vendorDto.getOpeningTime());
+        }
+        if (vendorDto.getClosingTime() != null) {
+            vendor.setClosingTime(vendorDto.getClosingTime());
+        }
+        if (vendorDto.getMinimumOrder() != null) {
+            vendor.setMinimumOrder(vendorDto.getMinimumOrder());
+        }
+        if (vendorDto.getDeliveryFee() != null) {
+            vendor.setDeliveryFee(vendorDto.getDeliveryFee());
+        }
+        if (vendorDto.getImageUrl() != null) {
+            vendor.setImageUrl(vendorDto.getImageUrl());
+        }
+        if (vendorDto.getFirstName() != null) {
+            vendor.setFirstName(vendorDto.getFirstName());
+        }
+        if (vendorDto.getLastName() != null) {
+            vendor.setLastName(vendorDto.getLastName());
+        }
+        if (vendorDto.getPhoneNumber() != null) {
+            vendor.setPhoneNumber(vendorDto.getPhoneNumber());
+        }
 
         Vendor savedVendor = vendorRepository.save(vendor);
         return modelMapper.map(savedVendor, VendorDto.class);

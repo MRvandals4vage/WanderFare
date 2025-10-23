@@ -50,24 +50,26 @@ public class SecurityConfig {
                 .requestMatchers("/api-docs/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
                 
+                // Public vendor browsing and menus (customers need to view)
+                .requestMatchers("/vendors/browse/**").permitAll()
+                .requestMatchers("/vendors/search/**").permitAll()
+                .requestMatchers("/vendors/filter/**").permitAll()
+                .requestMatchers("/vendors/{id}").permitAll()
+                .requestMatchers("/vendors/menu/vendor/**").permitAll() // Public menu viewing
+                
                 // Customer endpoints
                 .requestMatchers("/customers/**").hasRole("CUSTOMER")
                 .requestMatchers("/orders/**").hasAnyRole("CUSTOMER", "VENDOR", "ADMIN")
                 
-                // Vendor endpoints
+                // Vendor endpoints (menu management requires VENDOR role)
                 .requestMatchers("/vendors/profile").hasRole("VENDOR")
-                .requestMatchers("/vendors/menu/**").hasRole("VENDOR")
+                .requestMatchers("/vendors/menu").hasRole("VENDOR") // Creating menu items
+                .requestMatchers("/vendors/menu/{itemId}").hasRole("VENDOR") // Updating/deleting specific items
                 .requestMatchers("/vendors/analytics/**").hasRole("VENDOR")
                 .requestMatchers("/vendors/price-prediction/**").hasRole("VENDOR")
                 
                 // Admin endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                
-                // Public vendor browsing
-                .requestMatchers("/vendors/browse/**").permitAll()
-                .requestMatchers("/vendors/search/**").permitAll()
-                .requestMatchers("/vendors/filter/**").permitAll()
-                .requestMatchers("/vendors/{id}").permitAll()
                 
                 // All other requests need authentication
                 .anyRequest().authenticated()

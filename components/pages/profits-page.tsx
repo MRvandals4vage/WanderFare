@@ -60,23 +60,51 @@ export function ProfitsPage() {
         const transformed: ProfitData[] = response.monthlyData.map((item: any) => ({
           month: item.month || item.period || 'Unknown',
           sales: item.revenue || item.sales || 0,
-          expenses: item.expenses || item.costs || 0,
           profit: (item.revenue || item.sales || 0) - (item.expenses || item.costs || 0),
           margin: item.margin || 0,
           orders: item.orders || item.orderCount || 0
         }))
         setProfitData(transformed)
-      } else {
-        // Fallback: create sample structure if backend returns different format
-        setProfitData([])
+      } else if (response && (response.revenue !== undefined || response.profit !== undefined)) {
+        // Fallback: backend returns flat summary { revenue, estimatedCosts, profit, profitMargin }
+        const sales = Number(response.revenue || 0)
+        const expenses = Number(response.estimatedCosts || 0)
+        const profit = Number(response.profit || (sales - expenses))
+        const margin = Number(response.profitMargin || (sales > 0 ? (profit / sales) * 100 : 0))
+        setProfitData([
+          {
+            month: 'Selected Period',
+            sales,
+            expenses,
+            profit,
+            margin,
+            orders: 0,
+          },
+        ])
+      } else if (response && response.monthlyData === undefined) {
+        // Fallback: backend returns flat summary { revenue, estimatedCosts, profit, profitMargin }
+        const sales = Number(response.revenue || 0)
+        const expenses = Number(response.estimatedCosts || 0)
+        const profit = Number(response.profit || (sales - expenses))
+        const margin = Number(response.profitMargin || (sales > 0 ? (profit / sales) * 100 : 0))
+        setProfitData([
+          {
+            month: 'Selected Period',
+            sales,
+            expenses,
+            profit,
+            margin,
+            orders: 0,
+          },
+        ])
       }
-      
+
       // Set expense breakdown if available
       if (response && response.expenseBreakdown) {
         setExpenseBreakdown(response.expenseBreakdown)
       } else {
-        // Calculate basic breakdown from profit data
-        const totalExpenses = profitData.reduce((sum, month) => sum + month.expenses, 0)
+        // Calculate basic breakdown from latest profit data or response
+        const totalExpenses = (response && Number(response.estimatedCosts)) || profitData.reduce((sum, month) => sum + month.expenses, 0)
         if (totalExpenses > 0) {
           setExpenseBreakdown([
             { category: "Operating Costs", amount: totalExpenses * 0.6, percentage: 60 },

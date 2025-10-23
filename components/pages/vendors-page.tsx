@@ -9,8 +9,14 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Search, MapPin, Star, Clock, DollarSign } from "lucide-react"
 import { apiClient, Vendor } from "@/lib/api"
+import type { PageType } from "@/app/page"
 
-export function VendorsPage() {
+interface VendorsPageProps {
+  setCurrentPage: (page: PageType) => void
+  setSelectedVendorId: (id: number) => void
+}
+
+export function VendorsPage({ setCurrentPage, setSelectedVendorId }: VendorsPageProps) {
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -18,7 +24,7 @@ export function VendorsPage() {
   const [selectedCity, setSelectedCity] = useState<string>("all")
   const [selectedCuisine, setSelectedCuisine] = useState<string>("all")
   const [sortBy, setSortBy] = useState<string>("rating")
-  const [currentPage, setCurrentPage] = useState(0)
+  const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
 
   // Get unique cities and cuisines for filters
@@ -32,15 +38,15 @@ export function VendorsPage() {
       
       let response
       if (searchTerm.trim()) {
-        response = await apiClient.searchVendors(searchTerm, currentPage, 12)
+        response = await apiClient.searchVendors(searchTerm, page, 12)
       } else if (selectedCity !== "all" || selectedCuisine !== "all") {
-        const filters: any = { page: currentPage, size: 12 }
+        const filters: any = { page: page, size: 12 }
         if (selectedCity !== "all") filters.city = selectedCity
         if (selectedCuisine !== "all") filters.cuisineType = selectedCuisine
         response = await apiClient.filterVendors(filters)
       } else {
         response = await apiClient.getVendors({
-          page: currentPage,
+          page: page,
           size: 12,
           sortBy: sortBy,
           sortDir: "desc"
@@ -59,15 +65,15 @@ export function VendorsPage() {
 
   useEffect(() => {
     loadVendors()
-  }, [currentPage, sortBy])
+  }, [page, sortBy])
 
   const handleSearch = () => {
-    setCurrentPage(0)
+    setPage(0)
     loadVendors()
   }
 
   const handleFilter = () => {
-    setCurrentPage(0)
+    setPage(0)
     loadVendors()
   }
 
@@ -122,8 +128,8 @@ export function VendorsPage() {
 
         <div className="flex gap-2 pt-2">
           <Button className="flex-1" onClick={() => {
-            // TODO: Navigate to vendor menu page
-            console.log("View menu for vendor:", vendor.id)
+            setSelectedVendorId(vendor.id)
+            setCurrentPage("vendor-menu")
           }}>
             View Menu
           </Button>
@@ -236,18 +242,18 @@ export function VendorsPage() {
               <div className="flex justify-center items-center space-x-4">
                 <Button
                   variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                  disabled={currentPage === 0 || loading}
+                  onClick={() => setPage(prev => Math.max(0, prev - 1))}
+                  disabled={page === 0 || loading}
                 >
                   Previous
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {currentPage + 1} of {totalPages}
+                  Page {page + 1} of {totalPages}
                 </span>
                 <Button
                   variant="outline"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
-                  disabled={currentPage >= totalPages - 1 || loading}
+                  onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
+                  disabled={page >= totalPages - 1 || loading}
                 >
                   Next
                 </Button>

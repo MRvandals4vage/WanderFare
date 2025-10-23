@@ -179,8 +179,8 @@ public class OrderService {
         newOrderDto.setSpecialInstructions(originalOrder.getSpecialInstructions());
 
         // Convert order items
-        List<OrderDto.OrderItemDto> orderItems = originalOrder.getOrderItems()
-                .stream()
+        List<OrderDto.OrderItemDto> orderItems = originalOrder.getOrderItems() != null
+                ? originalOrder.getOrderItems().stream()
                 .map(item -> {
                     OrderDto.OrderItemDto itemDto = new OrderDto.OrderItemDto();
                     itemDto.setMenuItemId(item.getMenuItem().getId());
@@ -188,7 +188,8 @@ public class OrderService {
                     itemDto.setSpecialInstructions(item.getSpecialInstructions());
                     return itemDto;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : new java.util.ArrayList<>();
 
         newOrderDto.setOrderItems(orderItems);
 
@@ -213,8 +214,8 @@ public class OrderService {
         dto.setVendorName(order.getVendor().getBusinessName());
 
         // Convert order items
-        List<OrderDto.OrderItemDto> orderItemDtos = order.getOrderItems()
-                .stream()
+        List<OrderDto.OrderItemDto> orderItemDtos = order.getOrderItems() != null
+                ? order.getOrderItems().stream()
                 .map(item -> {
                     OrderDto.OrderItemDto itemDto = new OrderDto.OrderItemDto();
                     itemDto.setMenuItemId(item.getMenuItem().getId());
@@ -225,7 +226,8 @@ public class OrderService {
                     itemDto.setSpecialInstructions(item.getSpecialInstructions());
                     return itemDto;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                : new java.util.ArrayList<>();
 
         dto.setOrderItems(orderItemDtos);
         return dto;

@@ -9,8 +9,9 @@ import { Loader2, Package, DollarSign, Star, RotateCcw, MessageSquare } from "lu
 import { apiClient, Order } from "@/lib/api"
 import { useAuth } from "@/components/auth-provider"
 
-const getStatusColor = (status: string) => {
-  switch (status.toUpperCase()) {
+const getStatusColor = (status?: string) => {
+  const s = (status ?? "PENDING").toUpperCase()
+  switch (s) {
     case "DELIVERED":
       return "bg-green-100 text-green-800"
     case "PREPARING":
@@ -26,8 +27,9 @@ const getStatusColor = (status: string) => {
   }
 }
 
-const formatStatus = (status: string) => {
-  return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+const formatStatus = (status?: string) => {
+  const s = (status ?? "PENDING")
+  return s.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())
 }
 
 const renderStars = (rating: number) => {
@@ -201,16 +203,22 @@ export function HistoryPage() {
                     <div>
                       <h4 className="font-semibold mb-2">Items Ordered:</h4>
                       <ul className="text-muted-foreground space-y-1">
-                        {order.orderItems?.map((item, index) => (
-                          <li key={index} className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <span className="w-2 h-2 bg-primary rounded-full mr-2" />
-                              <span>{item.menuItem?.name || `Item ${item.menuItemId}`}</span>
-                              <span className="ml-2 text-sm">x{item.quantity}</span>
-                            </div>
-                            <span className="font-medium">${item.price.toFixed(2)}</span>
-                          </li>
-                        )) || (
+                        {order.orderItems?.map((item, index) => {
+                          const name = (item as any).menuItem?.name || (item as any).menuItemName || `Item ${item.menuItemId}`
+                          const quantity = Number(item.quantity || 1)
+                          const unitRaw = (item as any).price ?? (item as any).unitPrice ?? ((((item as any).totalPrice) ?? 0) / (quantity || 1))
+                          const unitPrice = Number(unitRaw || 0)
+                          return (
+                            <li key={index} className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <span className="w-2 h-2 bg-primary rounded-full mr-2" />
+                                <span>{name}</span>
+                                <span className="ml-2 text-sm">x{quantity}</span>
+                              </div>
+                              <span className="font-medium">${unitPrice.toFixed(2)}</span>
+                            </li>
+                          )
+                        }) || (
                           <li className="text-muted-foreground">No items details available</li>
                         )}
                       </ul>
@@ -227,10 +235,22 @@ export function HistoryPage() {
                       <div className="space-y-1">
                         <div className="flex items-center space-x-4">
                           <span className="font-semibold text-lg">
-                            ${(order.totalAmount + order.deliveryFee).toFixed(2)}
+                            {
+                              (() => {
+                                const ta = Number(order.totalAmount || 0)
+                                const df = Number(order.deliveryFee || 0)
+                                return `$${(ta + df).toFixed(2)}`
+                              })()
+                            }
                           </span>
                           <span className="text-sm text-muted-foreground">
-                            (${order.totalAmount.toFixed(2)} + ${order.deliveryFee.toFixed(2)} delivery)
+                            {
+                              (() => {
+                                const ta = Number(order.totalAmount || 0)
+                                const df = Number(order.deliveryFee || 0)
+                                return `($${ta.toFixed(2)} + $${df.toFixed(2)} delivery)`
+                              })()
+                            }
                           </span>
                         </div>
                         <div className="flex items-center">

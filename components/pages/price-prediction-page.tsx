@@ -12,8 +12,9 @@ class PricePredictionModel {
   private learningRate: number
   private iterations: number
 
-  constructor(learningRate = 0.01, iterations = 1000) {
-    this.weights = [Math.random(), Math.random(), Math.random(), Math.random()]
+  constructor(learningRate = 0.02, iterations = 1200) {
+    // weights[0] = bias, weights[1..4] = for 4 features
+    this.weights = Array.from({ length: 5 }, () => Math.random())
     this.learningRate = learningRate
     this.iterations = iterations
   }
@@ -25,11 +26,15 @@ class PricePredictionModel {
 
   predict(features: number[]): number {
     const normalizedFeatures = this.normalize(features)
-    let prediction = this.weights[0] // bias term
+    let prediction = this.weights[0] 
     for (let i = 0; i < normalizedFeatures.length; i++) {
-      prediction += this.weights[i + 1] * normalizedFeatures[i]
+      const w = this.weights[i + 1] ?? 0
+      prediction += w * normalizedFeatures[i]
     }
-    return Math.max(5, Math.min(50, prediction * 20))
+    // Scale to a realistic dollar range and clamp
+    const scaled = prediction * 20
+    const safe = Number.isFinite(scaled) ? scaled : 0
+    return Math.max(5, Math.min(50, safe))
   }
 
   train(): void {
@@ -43,13 +48,17 @@ class PricePredictionModel {
 
     for (let iter = 0; iter < this.iterations; iter++) {
       for (const data of trainingData) {
-        const prediction = this.predict(data.features)
-        const error = prediction - data.price
-        const normalizedFeatures = this.normalize(data.features)
+        // Forward pass (without clamping to preserve gradient signal)
+        const nf = this.normalize(data.features)
+        let raw = this.weights[0]
+        for (let i = 0; i < nf.length; i++) raw += (this.weights[i + 1] ?? 0) * nf[i]
+        const pred = raw * 20
+        const error = pred - data.price
 
-        this.weights[0] -= this.learningRate * error
-        for (let i = 0; i < normalizedFeatures.length; i++) {
-          this.weights[i + 1] -= this.learningRate * error * normalizedFeatures[i]
+        // Gradient descent updates
+        this.weights[0] -= this.learningRate * error * 1 * 20 / 20 // bias term update (scaled consistently)
+        for (let i = 0; i < nf.length; i++) {
+          this.weights[i + 1] -= this.learningRate * error * nf[i] / 20
         }
       }
     }

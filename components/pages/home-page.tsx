@@ -32,18 +32,11 @@ export function HomePage({ setCurrentPage }: HomePageProps) {
     <div className="min-h-screen">
       {/* Hero Section with Video Background */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Video Background */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          poster="/bustling-food-market-with-vendors-cooking.jpg"
-        >
-          <source src="/hero.mp4" type="video/mp4" />
-          <div className="text-white text-center p-4">Your browser does not support the video tag.</div>
-        </video>
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-center"
+          style={{ backgroundImage: 'url(/bustling-food-market-with-vendors-cooking.jpg)' }}
+        />
 
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/40" />

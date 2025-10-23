@@ -33,12 +33,10 @@ export interface RegisterRequest {
   lastName: string;
   phoneNumber?: string;
   role: 'CUSTOMER' | 'VENDOR';
-  // Customer fields
   city?: string;
   deliveryAddress?: string;
   postalCode?: string;
   preferences?: string;
-  // Vendor fields
   businessName?: string;
   businessAddress?: string;
   cuisineType?: string;
@@ -103,7 +101,6 @@ export interface OrderItem {
   menuItem: MenuItem;
 }
 
-// API Client Class
 class ApiClient {
   private getAuthHeaders(): HeadersInit {
     const token = localStorage.getItem('auth_token');
@@ -115,7 +112,6 @@ class ApiClient {
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
-    
     const config: RequestInit = {
       headers: this.getAuthHeaders(),
       ...options,
@@ -127,12 +123,10 @@ class ApiClient {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({} as any));
         const message = (errorData && (errorData.message || errorData.error)) || `HTTP ${response.status}: ${response.statusText}`;
-        // Attach status to the error so callers can branch (e.g., 404 fallback)
         const err = Object.assign(new Error(message), { status: response.status });
         throw err;
       }
 
-      // Handle no-content responses (e.g., DELETE 204)
       if (response.status === 204 || response.headers.get('Content-Length') === '0') {
         return undefined as unknown as T;
       }
@@ -144,17 +138,13 @@ class ApiClient {
     }
   }
 
-  // Authentication APIs
   async login(credentials: LoginRequest): Promise<AuthResponse> {
     const response = await this.request<AuthResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
-    
-    // Store token and user data
     localStorage.setItem('auth_token', response.token);
     localStorage.setItem('user_data', JSON.stringify(response));
-    
     return response;
   }
 
@@ -163,18 +153,14 @@ class ApiClient {
       method: 'POST',
       body: JSON.stringify(userData),
     });
-    
-    // Store token and user data
     localStorage.setItem('auth_token', response.token);
     localStorage.setItem('user_data', JSON.stringify(response));
-    
     return response;
   }
 
   logout(): void {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
-    // Clear all auth-related data
     localStorage.clear();
   }
 
@@ -187,7 +173,6 @@ class ApiClient {
     return !!localStorage.getItem('auth_token');
   }
 
-  // Vendor APIs
   async getVendors(params?: {
     page?: number;
     size?: number;
@@ -201,11 +186,9 @@ class ApiClient {
     if (params?.sortDir) searchParams.set('sortDir', params.sortDir);
 
     const query = searchParams.toString();
-    // Try paginated endpoint first
     try {
       return await this.request(`/vendors/browse/paginated${query ? `?${query}` : ''}`);
     } catch (err: any) {
-      // Fallback to non-paginated /vendors/browse and wrap the result
       const list = await this.request<Vendor[]>(`/vendors/browse`);
       return { content: list, totalElements: list.length, totalPages: 1 };
     }
@@ -233,11 +216,9 @@ class ApiClient {
         searchParams.set(key, value.toString());
       }
     });
-
     return this.request(`/vendors/filter?${searchParams.toString()}`);
   }
 
-  // Menu APIs
   async getVendorMenu(vendorId: number): Promise<MenuItem[]> {
     return this.request(`/vendors/menu/vendor/${vendorId}`);
   }
@@ -250,7 +231,6 @@ class ApiClient {
     return this.request(`/vendors/menu/vendor/${vendorId}/category/${encodeURIComponent(category)}`);
   }
 
-  // Order APIs
   async createOrder(orderData: {
     vendorId: number;
     deliveryAddress: string;
@@ -277,7 +257,6 @@ class ApiClient {
     });
   }
 
-  // Vendor-specific APIs (for vendor users)
   async getVendorProfile(): Promise<Vendor> {
     return this.request('/vendors/profile');
   }
@@ -289,7 +268,6 @@ class ApiClient {
     });
   }
 
-  // Prefer explicit vendor update by ID (backend typically exposes /vendors/{id})
   async updateVendor(vendorId: number, profileData: Partial<Vendor>): Promise<Vendor> {
     return this.request(`/vendors/${vendorId}`, {
       method: 'PUT',
@@ -297,30 +275,9 @@ class ApiClient {
     });
   }
 
-  // Tries multiple common endpoints to create/update vendor profile
   async saveVendorProfileSmart(userId: number, profileData: Partial<Vendor>): Promise<Vendor> {
-    const bodyWithUser = JSON.stringify({ userId, ...profileData });
-    // Attempt 1: POST /vendors with { userId, ... }
-    try {
-      return await this.request('/vendors', {
-        method: 'POST',
-        body: bodyWithUser,
-      });
-    } catch (e1: any) {
-      // Attempt 2: POST /vendors/{userId}
-      try {
-        return await this.request(`/vendors/${userId}`, {
-          method: 'POST',
-          body: JSON.stringify(profileData),
-        });
-      } catch (e2: any) {
-        // Attempt 3: PUT /vendors/profile with userId in body
-        return await this.request('/vendors/profile', {
-          method: 'PUT',
-          body: bodyWithUser,
-        });
-      }
-    }
+    // Backend identifies vendor from JWT; only PUT /vendors/profile is supported
+    return this.updateVendorProfile(profileData);
   }
 
   async getVendorOrders(page = 0, size = 10): Promise<{ content: Order[] }> {
@@ -334,7 +291,6 @@ class ApiClient {
     });
   }
 
-  // Menu management (for vendors)
   async createMenuItem(menuItem: Omit<MenuItem, 'id'>): Promise<MenuItem> {
     return this.request('/vendors/menu', {
       method: 'POST',
@@ -342,7 +298,6 @@ class ApiClient {
     });
   }
 
-  // Resilient creation: try multiple common patterns if the first fails
   async createMenuItemSmart(vendorId: number, partial: Partial<MenuItem>): Promise<MenuItem> {
     const base: any = {
       name: partial.name,
@@ -354,18 +309,15 @@ class ApiClient {
       isVegan: !!partial.isVegan,
       isGlutenFree: !!partial.isGlutenFree,
     };
-    // Attempt 1: POST /vendors/menu with vendorId in body
     try {
       return await this.createMenuItem({ vendorId, ...base } as any);
     } catch (e1: any) {
-      // Attempt 2: POST /vendors/{vendorId}/menu
       try {
         return await this.request(`/vendors/${vendorId}/menu`, {
           method: 'POST',
           body: JSON.stringify(base),
         });
       } catch (e2: any) {
-        // Attempt 3: POST /vendors/menu/vendor/{vendorId}
         return await this.request(`/vendors/menu/vendor/${vendorId}`, {
           method: 'POST',
           body: JSON.stringify(base),
@@ -387,12 +339,10 @@ class ApiClient {
     });
   }
 
-  // Analytics APIs (for vendors)
   async getVendorAnalytics(startDate?: string, endDate?: string): Promise<any> {
     const params = new URLSearchParams();
     if (startDate) params.set('startDate', startDate);
     if (endDate) params.set('endDate', endDate);
-    
     const query = params.toString();
     return this.request(`/vendors/analytics/dashboard${query ? `?${query}` : ''}`);
   }
@@ -403,18 +353,27 @@ class ApiClient {
 
   async getProfitAnalytics(startDate?: string, endDate?: string): Promise<any> {
     const params = new URLSearchParams();
-    if (startDate) params.set('startDate', startDate);
-    if (endDate) params.set('endDate', endDate);
-    
+    const normalize = (d: string) => {
+      // If only a date (YYYY-MM-DD) is provided, expand to full ISO datetime
+      if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return `${d}T00:00:00`;
+      return d;
+    };
+    if (startDate) params.set('startDate', normalize(startDate));
+    if (endDate) {
+      if (/^\d{4}-\d{2}-\d{2}$/.test(endDate)) {
+        // End of day for endDate
+        params.set('endDate', `${endDate}T23:59:59`);
+      } else {
+        params.set('endDate', endDate);
+      }
+    }
     const query = params.toString();
     return this.request(`/vendors/analytics/profits${query ? `?${query}` : ''}`);
   }
 }
 
-// Export singleton instance
 export const apiClient = new ApiClient();
 
-// Export utility functions
 export const auth = {
   login: (credentials: LoginRequest) => apiClient.login(credentials),
   register: (userData: RegisterRequest) => apiClient.register(userData),

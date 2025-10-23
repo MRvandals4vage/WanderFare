@@ -49,7 +49,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                                           @Param("endDate") LocalDateTime endDate);
     
     @Query("SELECT SUM(o.finalAmount) FROM Order o WHERE o.vendor.id = :vendorId AND " +
-           "o.status = 'DELIVERED' AND o.createdAt BETWEEN :startDate AND :endDate")
+           "o.status <> 'CANCELLED' AND o.createdAt BETWEEN :startDate AND :endDate")
     BigDecimal calculateVendorRevenue(@Param("vendorId") Long vendorId,
                                      @Param("startDate") LocalDateTime startDate,
                                      @Param("endDate") LocalDateTime endDate);

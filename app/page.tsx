@@ -12,12 +12,14 @@ import { ProfitsPage } from "@/components/pages/profits-page"
 import { DashboardPage } from "@/components/pages/dashboard-page"
 import { ManageVendorsPage } from "@/components/pages/manage-vendors-page"
 import { ManageCustomersPage } from "@/components/pages/manage-customers-page"
+import { VendorMenuPage } from "@/components/pages/vendor-menu-page"
 import { useState, useEffect } from "react"
 
 export type PageType =
   | "home"
   | "login"
   | "vendors"
+  | "vendor-menu"
   | "history"
   | "profile"
   | "price-prediction"
@@ -29,6 +31,7 @@ export type PageType =
 export default function App() {
   const { userRole } = useAuth()
   const [currentPage, setCurrentPage] = useState<PageType>("home")
+  const [selectedVendorId, setSelectedVendorId] = useState<number | null>(null)
 
   useEffect(() => {
     if (!userRole && currentPage !== "home" && currentPage !== "login") {
@@ -43,7 +46,13 @@ export default function App() {
       case "login":
         return <LoginPage />
       case "vendors":
-        return <VendorsPage />
+        return <VendorsPage setCurrentPage={setCurrentPage} setSelectedVendorId={setSelectedVendorId} />
+      case "vendor-menu":
+        return selectedVendorId ? (
+          <VendorMenuPage vendorId={selectedVendorId} setCurrentPage={setCurrentPage} />
+        ) : (
+          <VendorsPage setCurrentPage={setCurrentPage} setSelectedVendorId={setSelectedVendorId} />
+        )
       case "history":
         return <HistoryPage />
       case "profile":

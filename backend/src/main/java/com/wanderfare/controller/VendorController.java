@@ -118,11 +118,23 @@ public class VendorController {
     }
 
     private Long getCurrentVendorId(Authentication authentication) {
-        // TODO: Extract vendor ID from JWT claims set in JwtAuthenticationFilter
         if (authentication == null) {
             throw new IllegalStateException("Unauthenticated access");
         }
-        authentication.getName(); // read to avoid unused warning
-        return 1L; // Placeholder - implement proper JWT claim extraction
+        
+        // Extract userId from authentication details set by JwtAuthenticationFilter
+        Object details = authentication.getDetails();
+        if (details instanceof java.util.Map) {
+            @SuppressWarnings("unchecked")
+            java.util.Map<String, Object> detailsMap = (java.util.Map<String, Object>) details;
+            Object userId = detailsMap.get("userId");
+            if (userId instanceof Long) {
+                return (Long) userId;
+            } else if (userId instanceof Integer) {
+                return ((Integer) userId).longValue();
+            }
+        }
+        
+        throw new IllegalStateException("Unable to extract user ID from authentication");
     }
 }

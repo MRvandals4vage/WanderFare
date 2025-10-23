@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -83,18 +85,67 @@ public class AnalyticsService {
     public Map<String, Object> getProfitAnalytics(Long vendorId, LocalDateTime startDate, LocalDateTime endDate) {
         Map<String, Object> profitData = new HashMap<>();
 
-        BigDecimal revenue = orderRepository.calculateVendorRevenue(vendorId, startDate, endDate);
-        
-        // Simplified profit calculation (revenue - estimated costs)
-        // In real implementation, you'd track actual costs
-        BigDecimal estimatedCosts = revenue != null ? revenue.multiply(new BigDecimal("0.7")) : BigDecimal.ZERO;
-        BigDecimal profit = revenue != null ? revenue.subtract(estimatedCosts) : BigDecimal.ZERO;
+        // Pull all orders for the period and compute monthly breakdown (exclude CANCELLED)
+        List<Order> periodOrders = orderRepository.findByVendorIdAndDateRange(vendorId, startDate, endDate);
 
-        profitData.put("revenue", revenue != null ? revenue : BigDecimal.ZERO);
+        // Aggregate totals
+        BigDecimal revenue = BigDecimal.ZERO;
+        long totalOrders = 0;
+        for (Order o : periodOrders) {
+            if (o.getStatus() != Order.OrderStatus.CANCELLED) {
+                revenue = revenue.add(o.getFinalAmount() != null ? o.getFinalAmount() : BigDecimal.ZERO);
+                totalOrders++;
+            }
+        }
+
+        // Estimated costs and profit
+        BigDecimal estimatedCosts = revenue.multiply(new BigDecimal("0.7"));
+        BigDecimal profit = revenue.subtract(estimatedCosts);
+        BigDecimal profitMargin = revenue.compareTo(BigDecimal.ZERO) > 0
+                ? profit.divide(revenue, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100"))
+                : BigDecimal.ZERO;
+
+        // Build monthlyData list for frontend table
+        List<Map<String, Object>> monthlyData = new ArrayList<>();
+        YearMonth startYm = YearMonth.from(startDate);
+        YearMonth endYm = YearMonth.from(endDate);
+
+        YearMonth cursor = startYm;
+        while (!cursor.isAfter(endYm)) {
+            BigDecimal mRevenue = BigDecimal.ZERO;
+            long mOrders = 0;
+            for (Order o : periodOrders) {
+                if (o.getStatus() == Order.OrderStatus.CANCELLED) continue;
+                LocalDateTime created = o.getCreatedAt();
+                if (created != null && YearMonth.from(created).equals(cursor)) {
+                    mRevenue = mRevenue.add(o.getFinalAmount() != null ? o.getFinalAmount() : BigDecimal.ZERO);
+                    mOrders++;
+                }
+            }
+            BigDecimal mCosts = mRevenue.multiply(new BigDecimal("0.7"));
+            BigDecimal mProfit = mRevenue.subtract(mCosts);
+            BigDecimal mMargin = mRevenue.compareTo(BigDecimal.ZERO) > 0
+                    ? mProfit.divide(mRevenue, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100"))
+                    : BigDecimal.ZERO;
+
+            Map<String, Object> monthRow = new HashMap<>();
+            monthRow.put("month", cursor.toString()); // e.g., 2025-10
+            monthRow.put("revenue", mRevenue);
+            monthRow.put("expenses", mCosts);
+            monthRow.put("profit", mProfit);
+            monthRow.put("margin", mMargin);
+            monthRow.put("orders", mOrders);
+            monthlyData.add(monthRow);
+
+            cursor = cursor.plusMonths(1);
+        }
+
+        profitData.put("revenue", revenue);
         profitData.put("estimatedCosts", estimatedCosts);
         profitData.put("profit", profit);
-        profitData.put("profitMargin", revenue != null && revenue.compareTo(BigDecimal.ZERO) > 0 ? 
-                profit.divide(revenue, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")) : BigDecimal.ZERO);
+        profitData.put("profitMargin", profitMargin);
+        profitData.put("orderCount", totalOrders);
+        profitData.put("monthlyData", monthlyData);
 
         return profitData;
     }

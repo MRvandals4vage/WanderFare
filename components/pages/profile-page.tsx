@@ -41,7 +41,9 @@ export function ProfilePage() {
     try {
       setLoading(true)
       setError("")
-      const profile = await apiClient.getVendorProfile()
+      
+      // Try to load existing vendor profile
+      let profile = await apiClient.getVendorProfile()
       setVendorData(profile)
       
       // Load menu items for this vendor
@@ -50,7 +52,35 @@ export function ProfilePage() {
       }
     } catch (err: any) {
       console.error("Failed to load profile:", err)
-      setError("Failed to load profile. Please try again.")
+      
+      // If profile doesn't exist (404), create a fallback profile
+      if (err.status === 404 && user) {
+        const fallbackProfile: Vendor = {
+          id: 0, // Will be set by backend when saved
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phoneNumber: "",
+          businessName: "",
+          businessAddress: "",
+          city: "",
+          postalCode: "",
+          cuisineType: "",
+          description: "",
+          openingTime: "09:00",
+          closingTime: "22:00",
+          minimumOrder: 0,
+          deliveryFee: 0,
+          rating: 0,
+          totalReviews: 0,
+          isApproved: false,
+          imageUrl: ""
+        }
+        setVendorData(fallbackProfile)
+        setSuccess("Please fill in your business information below.")
+      } else {
+        setError("Failed to load profile. Please try again.")
+      }
     } finally {
       setLoading(false)
     }
@@ -76,9 +106,16 @@ export function ProfilePage() {
       setError("")
       setSuccess("")
       
+      // Backend identifies the vendor from JWT; always use PUT /vendors/profile
       const updated = await apiClient.updateVendorProfile(vendorData)
+      
       setVendorData(updated)
       setSuccess("Profile updated successfully!")
+      
+      // Reload menu items if vendor ID changed (new profile created)
+      if (updated.id && (vendorData.id === 0 || updated.id !== vendorData.id)) {
+        loadMenuItems(updated.id)
+      }
     } catch (err: any) {
       console.error("Failed to update profile:", err)
       setError("Failed to update profile. Please try again.")
