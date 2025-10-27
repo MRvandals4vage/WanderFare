@@ -60,6 +60,7 @@ export function ProfitsPage() {
         const transformed: ProfitData[] = response.monthlyData.map((item: any) => ({
           month: item.month || item.period || 'Unknown',
           sales: item.revenue || item.sales || 0,
+          expenses: item.expenses || item.costs || 0,
           profit: (item.revenue || item.sales || 0) - (item.expenses || item.costs || 0),
           margin: item.margin || 0,
           orders: item.orders || item.orderCount || 0

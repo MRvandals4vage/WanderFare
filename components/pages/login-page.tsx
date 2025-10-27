@@ -10,9 +10,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function LoginPage() {
-  const { login, register, isLoading } = useAuth()
+  const { login, register, isLoading, isAuthenticated } = useAuth()
+  const router = useRouter()
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
   const [selectedRole, setSelectedRole] = useState<"CUSTOMER" | "VENDOR">("CUSTOMER")
@@ -34,6 +36,7 @@ export function LoginPage() {
     try {
       await login(email, password)
       setSuccess("Login successful!")
+      router.replace("/")
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.")
     }
@@ -81,9 +84,15 @@ export function LoginPage() {
     try {
       await register(userData)
       setSuccess("Registration successful!")
+      router.replace("/")
     } catch (err: any) {
       setError(err.message || "Registration failed. Please try again.")
     }
+  }
+
+  // Redirect away from login if already authenticated
+  if (isAuthenticated) {
+    typeof window !== "undefined" && router.replace("/")
   }
 
   return (

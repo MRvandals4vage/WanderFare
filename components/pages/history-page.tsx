@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Package, DollarSign, Star, RotateCcw, MessageSquare } from "lucide-react"
+import { Loader2, Package, DollarSign, Star, RotateCcw, MessageSquare, Clock, ShoppingBag } from "lucide-react"
 import { apiClient, Order } from "@/lib/api"
 import { useAuth } from "@/components/auth-provider"
 
@@ -13,17 +13,17 @@ const getStatusColor = (status?: string) => {
   const s = (status ?? "PENDING").toUpperCase()
   switch (s) {
     case "DELIVERED":
-      return "bg-green-100 text-green-800"
+      return "rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1"
     case "PREPARING":
-      return "bg-blue-100 text-blue-800"
+      return "rounded-full bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs px-2.5 py-1"
     case "OUT_FOR_DELIVERY":
-      return "bg-purple-100 text-purple-800"
+      return "rounded-full bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs px-2.5 py-1"
     case "PENDING":
-      return "bg-yellow-100 text-yellow-800"
+      return "rounded-full bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs px-2.5 py-1"
     case "CANCELLED":
-      return "bg-red-100 text-red-800"
+      return "rounded-full bg-red-500/10 text-red-600 border-red-500/20 text-xs px-2.5 py-1"
     default:
-      return "bg-gray-100 text-gray-800"
+      return "rounded-full bg-gray-500/10 text-gray-600 border-gray-500/20 text-xs px-2.5 py-1"
   }
 }
 
@@ -34,8 +34,8 @@ const formatStatus = (status?: string) => {
 
 const renderStars = (rating: number) => {
   return Array.from({ length: 5 }, (_, i) => (
-    <Star 
-      key={i} 
+    <Star
+      key={i}
       className={`w-4 h-4 ${i < rating ? "text-yellow-400 fill-current" : "text-gray-300"}`}
     />
   ))
@@ -54,16 +54,16 @@ export function HistoryPage() {
     try {
       setLoading(true)
       setError("")
-      
+
       const response = await apiClient.getCustomerOrders(page, 10)
       const newOrders = response.content || []
-      
+
       if (append) {
         setOrders(prev => [...prev, ...newOrders])
       } else {
         setOrders(newOrders)
       }
-      
+
       setHasMore(newOrders.length === 10)
     } catch (err: any) {
       console.error("Failed to load orders:", err)
@@ -128,9 +128,9 @@ export function HistoryPage() {
 
   return (
     <div className="min-h-screen bg-background py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Order History</h1>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 md:mb-10">
+          <h1 className="text-4xl font-bold text-foreground mb-4 text-balance">Order History</h1>
           <p className="text-xl text-muted-foreground">Track your past orders and experiences</p>
         </div>
 
@@ -141,32 +141,32 @@ export function HistoryPage() {
         )}
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <Card className="group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1 hover:ring-foreground/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-2xl text-primary flex items-center">
+              <CardTitle className="text-3xl text-primary flex items-center font-semibold">
                 <Package className="w-6 h-6 mr-2" />
                 {totalOrders}
               </CardTitle>
-              <CardDescription>Total Orders</CardDescription>
+              <CardDescription className="text-base">Total Orders</CardDescription>
             </CardHeader>
           </Card>
-          <Card>
+          <Card className="group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1 hover:ring-foreground/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-2xl text-primary flex items-center">
+              <CardTitle className="text-3xl text-primary flex items-center font-semibold">
                 <DollarSign className="w-6 h-6 mr-2" />
                 ${totalSpent.toFixed(2)}
               </CardTitle>
-              <CardDescription>Total Spent</CardDescription>
+              <CardDescription className="text-base">Total Spent</CardDescription>
             </CardHeader>
           </Card>
-          <Card>
+          <Card className="group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1 hover:ring-foreground/10">
             <CardHeader className="pb-2">
-              <CardTitle className="text-2xl text-primary flex items-center">
+              <CardTitle className="text-3xl text-primary flex items-center font-semibold">
                 <Star className="w-6 h-6 mr-2" />
                 ${averageOrderValue.toFixed(2)}
               </CardTitle>
-              <CardDescription>Average Order Value</CardDescription>
+              <CardDescription className="text-base">Average Order Value</CardDescription>
             </CardHeader>
           </Card>
         </div>
@@ -181,16 +181,16 @@ export function HistoryPage() {
 
         {/* Orders List */}
         {!loading && orders.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {orders.map((order) => (
-              <Card key={order.id} className="hover:shadow-md transition-shadow">
-                <CardHeader>
+              <Card key={order.id} className="group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1 hover:ring-foreground/10">
+                <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-lg">Order #{order.id}</CardTitle>
-                      <CardDescription>
-                        {new Date(order.createdAt).toLocaleDateString()} • 
-                        Vendor ID: {order.vendorId}
+                    <div className="flex-1">
+                      <CardTitle className="text-xl font-semibold tracking-tight">Order #{order.id}</CardTitle>
+                      <CardDescription className="mt-1 flex items-center gap-1.5 text-base">
+                        <Clock className="h-4 w-4 text-foreground/70" />
+                        {new Date(order.createdAt).toLocaleDateString()} • Vendor ID: {order.vendorId}
                       </CardDescription>
                     </div>
                     <Badge className={getStatusColor(order.orderStatus)}>
@@ -198,89 +198,91 @@ export function HistoryPage() {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold mb-2">Items Ordered:</h4>
-                      <ul className="text-muted-foreground space-y-1">
-                        {order.orderItems?.map((item, index) => {
-                          const name = (item as any).menuItem?.name || (item as any).menuItemName || `Item ${item.menuItemId}`
-                          const quantity = Number(item.quantity || 1)
-                          const unitRaw = (item as any).price ?? (item as any).unitPrice ?? ((((item as any).totalPrice) ?? 0) / (quantity || 1))
-                          const unitPrice = Number(unitRaw || 0)
-                          return (
-                            <li key={index} className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <span className="w-2 h-2 bg-primary rounded-full mr-2" />
-                                <span>{name}</span>
-                                <span className="ml-2 text-sm">x{quantity}</span>
-                              </div>
-                              <span className="font-medium">${unitPrice.toFixed(2)}</span>
-                            </li>
-                          )
-                        }) || (
-                          <li className="text-muted-foreground">No items details available</li>
-                        )}
-                      </ul>
+                <CardContent className="p-6 md:p-8 space-y-6">
+                  <div>
+                    <h4 className="font-semibold mb-3">Items Ordered:</h4>
+                    <ul className="text-muted-foreground space-y-2">
+                      {order.orderItems?.map((item, index) => {
+                        const name = (item as any).menuItem?.name || (item as any).menuItemName || `Item ${item.menuItemId}`
+                        const quantity = Number(item.quantity || 1)
+                        const unitRaw = (item as any).price ?? (item as any).unitPrice ?? ((((item as any).totalPrice) ?? 0) / (quantity || 1))
+                        const unitPrice = Number(unitRaw || 0)
+                        return (
+                          <li key={index} className="flex items-center justify-between py-2 px-3 rounded-lg border bg-muted/40">
+                            <div className="flex items-center gap-2">
+                              <ShoppingBag className="w-4 h-4 text-foreground/70" />
+                              <span className="font-medium">{name}</span>
+                              <span className="text-sm text-muted-foreground">x{quantity}</span>
+                            </div>
+                            <span className="font-medium">${unitPrice.toFixed(2)}</span>
+                          </li>
+                        )
+                      }) || (
+                        <li className="text-muted-foreground">No items details available</li>
+                      )}
+                    </ul>
+                  </div>
+
+                  {order.specialInstructions && (
+                    <div className="rounded-lg border bg-muted/40 p-4">
+                      <h4 className="font-semibold mb-1 flex items-center gap-1.5">
+                        <MessageSquare className="h-4 w-4" />
+                        Special Instructions:
+                      </h4>
+                      <p className="text-muted-foreground text-sm">{order.specialInstructions}</p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-border">
+                    <div className="space-y-2">
+                      <div className="text-2xl font-bold text-primary">
+                        {
+                          (() => {
+                            const ta = Number(order.totalAmount || 0)
+                            const df = Number(order.deliveryFee || 0)
+                            return `$${(ta + df).toFixed(2)}`
+                          })()
+                        }
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {
+                          (() => {
+                            const ta = Number(order.totalAmount || 0)
+                            const df = Number(order.deliveryFee || 0)
+                            return `Subtotal: $${ta.toFixed(2)} + $${df.toFixed(2)} delivery`
+                          })()
+                        }
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className={
+                          order.paymentStatus === "PAID" ?
+                            "rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1" :
+                            "rounded-full bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs px-2.5 py-1"
+                        }>
+                          {order.paymentStatus}
+                        </Badge>
+                      </div>
                     </div>
 
-                    {order.specialInstructions && (
-                      <div>
-                        <h4 className="font-semibold mb-1">Special Instructions:</h4>
-                        <p className="text-muted-foreground text-sm">{order.specialInstructions}</p>
-                      </div>
-                    )}
-
-                    <div className="flex justify-between items-center pt-4 border-t border-border">
-                      <div className="space-y-1">
-                        <div className="flex items-center space-x-4">
-                          <span className="font-semibold text-lg">
-                            {
-                              (() => {
-                                const ta = Number(order.totalAmount || 0)
-                                const df = Number(order.deliveryFee || 0)
-                                return `$${(ta + df).toFixed(2)}`
-                              })()
-                            }
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            {
-                              (() => {
-                                const ta = Number(order.totalAmount || 0)
-                                const df = Number(order.deliveryFee || 0)
-                                return `($${ta.toFixed(2)} + $${df.toFixed(2)} delivery)`
-                              })()
-                            }
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <Badge variant="outline" className={
-                            order.paymentStatus === "PAID" ? "text-green-600" : "text-orange-600"
-                          }>
-                            {order.paymentStatus}
-                          </Badge>
-                        </div>
-                      </div>
-                      
-                      <div className="flex space-x-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleReorder(order.id)}
-                          disabled={reorderingId === order.id}
-                        >
-                          {reorderingId === order.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin mr-1" />
-                          ) : (
-                            <RotateCcw className="w-4 h-4 mr-1" />
-                          )}
-                          Reorder
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <MessageSquare className="w-4 h-4 mr-1" />
-                          Review
-                        </Button>
-                      </div>
+                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleReorder(order.id)}
+                        disabled={reorderingId === order.id}
+                        className="sm:w-auto w-full"
+                      >
+                        {reorderingId === order.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                        ) : (
+                          <RotateCcw className="w-4 h-4 mr-1" />
+                        )}
+                        Reorder
+                      </Button>
+                      <Button variant="outline" size="sm" className="sm:w-auto w-full">
+                        <MessageSquare className="w-4 h-4 mr-1" />
+                        Review
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -308,7 +310,7 @@ export function HistoryPage() {
         {/* Load More Button */}
         {!loading && orders.length > 0 && hasMore && (
           <div className="text-center mt-8">
-            <Button variant="outline" onClick={loadMoreOrders} disabled={loading}>
+            <Button variant="outline" onClick={loadMoreOrders} disabled={loading} className="px-8">
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />

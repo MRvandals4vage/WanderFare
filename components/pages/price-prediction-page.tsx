@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Bolt, Info } from "lucide-react"
 
 class PricePredictionModel {
   private weights: number[]
@@ -56,9 +57,9 @@ class PricePredictionModel {
         const error = pred - data.price
 
         // Gradient descent updates
-        this.weights[0] -= this.learningRate * error * 1 * 20 / 20 // bias term update (scaled consistently)
+        this.weights[0] -= this.learningRate * error
         for (let i = 0; i < nf.length; i++) {
-          this.weights[i + 1] -= this.learningRate * error * nf[i] / 20
+          this.weights[i + 1] -= this.learningRate * error * nf[i]
         }
       }
     }
@@ -105,21 +106,21 @@ export function PricePredictionPage() {
 
   return (
     <div className="min-h-screen bg-background py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Price Prediction</h1>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 md:mb-10">
+          <h1 className="text-4xl font-bold text-foreground mb-4 text-balance">Price Prediction</h1>
           <p className="text-xl text-muted-foreground">
             Use our AI model to predict optimal pricing based on market conditions
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
+          <Card className="group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1 hover:ring-foreground/10">
             <CardHeader>
               <CardTitle>Market Conditions</CardTitle>
               <CardDescription>Enter current market data to get price predictions</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-6 md:p-8 space-y-6">
               <div>
                 <Label htmlFor="month">Month</Label>
                 <Select
@@ -190,7 +191,7 @@ export function PricePredictionPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:shadow-md hover:ring-1 hover:ring-foreground/10">
             <CardHeader>
               <CardTitle>Prediction Results</CardTitle>
               <CardDescription>AI-powered price recommendations</CardDescription>
@@ -198,9 +199,9 @@ export function PricePredictionPage() {
             <CardContent className="space-y-6">
               {prediction !== null ? (
                 <div className="text-center space-y-4">
-                  <div className="text-6xl font-bold text-primary">${prediction.toFixed(2)}</div>
+                  <div className="text-6xl md:text-7xl font-bold text-primary">${prediction.toFixed(2)}</div>
                   <p className="text-lg text-muted-foreground">Recommended Price</p>
-                  <div className="bg-muted p-4 rounded-lg space-y-2">
+                  <div className="rounded-lg border bg-muted/40 p-4 space-y-2">
                     <h4 className="font-semibold">Price Range Analysis:</h4>
                     <div className="flex justify-between">
                       <span>Conservative:</span>
@@ -214,6 +215,21 @@ export function PricePredictionPage() {
                       <span>Aggressive:</span>
                       <span className="font-medium">${(prediction * 1.1).toFixed(2)}</span>
                     </div>
+                  </div>
+
+                  <div className="flex flex-wrap justify-center gap-2 pt-1">
+                    {inputs.month && (
+                      <span className="rounded-full bg-foreground/5 text-foreground/80 border border-foreground/10 text-xs px-2.5 py-1">Month {inputs.month}</span>
+                    )}
+                    {inputs.demand && (
+                      <span className="rounded-full bg-foreground/5 text-foreground/80 border border-foreground/10 text-xs px-2.5 py-1">Demand {inputs.demand}%</span>
+                    )}
+                    {inputs.competition && (
+                      <span className="rounded-full bg-foreground/5 text-foreground/80 border border-foreground/10 text-xs px-2.5 py-1">Competition {inputs.competition}</span>
+                    )}
+                    {inputs.ingredientCost && (
+                      <span className="rounded-full bg-foreground/5 text-foreground/80 border border-foreground/10 text-xs px-2.5 py-1">Cost ${inputs.ingredientCost}</span>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -234,6 +250,7 @@ export function PricePredictionPage() {
                   disabled={isTraining}
                   className="w-full bg-transparent"
                 >
+                  <Bolt className="h-4 w-4 mr-2" />
                   {isTraining ? "Retraining Model..." : "Retrain Model"}
                 </Button>
               </div>
@@ -241,10 +258,13 @@ export function PricePredictionPage() {
           </Card>
         </div>
 
-        <Card className="mt-8">
+        <Card className="mt-8 transition-all duration-200 hover:shadow-md hover:ring-1 hover:ring-foreground/10">
           <CardHeader>
             <CardTitle>How It Works</CardTitle>
-            <CardDescription>Understanding the price prediction algorithm</CardDescription>
+            <CardDescription className="flex items-center gap-2">
+              <Info className="h-4 w-4" />
+              Understanding the price prediction algorithm
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

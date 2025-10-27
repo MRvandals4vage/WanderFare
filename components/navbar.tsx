@@ -4,16 +4,36 @@ import { useAuth } from "@/components/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import {
+  Home,
+  Menu,
+  MessageSquare,
+  Settings,
+  Users,
+  ShoppingBag,
+  History,
+  User,
+  TrendingUp,
+  BarChart3,
+  LogOut,
+  Utensils,
+  Search,
+  Clock,
+  DollarSign,
+  Star,
+  ChevronDown,
+  Bell,
+  ShoppingCart
+} from "lucide-react"
 import type { PageType } from "@/app/page"
 import { useState } from "react"
-import { User, LogOut, Settings } from "lucide-react"
 
-interface NavbarProps {
+interface TopNavbarProps {
   currentPage: PageType
   setCurrentPage: (page: PageType) => void
 }
 
-export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
+function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
   const { user, userRole, logout, isAuthenticated } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -21,7 +41,6 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
     logout()
     setCurrentPage("home")
     setIsMobileMenuOpen(false)
-    // Force page reload to clear all state
     window.location.href = "/"
   }
 
@@ -33,34 +52,35 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
   const getNavItems = () => {
     if (!isAuthenticated || !userRole) {
       return [
-        { label: "Home", page: "home" as PageType },
-        { label: "Login", page: "login" as PageType },
+        { label: "Home", page: "home" as PageType, icon: Home },
+        { label: "Browse Vendors", page: "vendors" as PageType, icon: Search },
       ]
     }
 
     switch (userRole) {
       case "CUSTOMER":
         return [
-          { label: "Home", page: "home" as PageType },
-          { label: "Vendors", page: "vendors" as PageType },
-          { label: "History", page: "history" as PageType },
+          { label: "Home", page: "home" as PageType, icon: Home },
+          { label: "Browse Vendors", page: "vendors" as PageType, icon: Search },
+          { label: "Order History", page: "history" as PageType, icon: History },
+          { label: "Profile", page: "profile" as PageType, icon: User },
         ]
       case "VENDOR":
         return [
-          { label: "Home", page: "home" as PageType },
-          { label: "Profile", page: "profile" as PageType },
-          { label: "Price Prediction", page: "price-prediction" as PageType },
-          { label: "Profits", page: "profits" as PageType },
+          { label: "Home", page: "home" as PageType, icon: Home },
+          { label: "My Profile", page: "profile" as PageType, icon: User },
+          { label: "Price Prediction", page: "price-prediction" as PageType, icon: TrendingUp },
+          { label: "Profits & Analytics", page: "profits" as PageType, icon: BarChart3 },
         ]
       case "ADMIN":
         return [
-          { label: "Home", page: "home" as PageType },
-          { label: "Dashboard", page: "dashboard" as PageType },
-          { label: "Manage Vendors", page: "manage-vendors" as PageType },
-          { label: "Manage Customers", page: "manage-customers" as PageType },
+          { label: "Home", page: "home" as PageType, icon: Home },
+          { label: "Dashboard", page: "dashboard" as PageType, icon: BarChart3 },
+          { label: "Manage Vendors", page: "manage-vendors" as PageType, icon: Utensils },
+          { label: "Manage Customers", page: "manage-customers" as PageType, icon: Users },
         ]
       default:
-        return [{ label: "Home", page: "home" as PageType }]
+        return [{ label: "Home", page: "home" as PageType, icon: Home }]
     }
   }
 
@@ -68,176 +88,299 @@ export function Navbar({ currentPage, setCurrentPage }: NavbarProps) {
   const userInitials = user ? `${user.firstName[0]}${user.lastName[0]}` : "U"
 
   return (
-    <nav className="bg-background/95 border-b border-border sticky top-0 z-50 backdrop-blur-sm">
-      {/* Curved design using SVG path */}
-      <div className="absolute inset-0 overflow-hidden">
-        <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 1200 80"
-          preserveAspectRatio="none"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M0 0 L1200 0 L1200 60 Q600 80 0 60 Z"
-            fill="rgb(var(--primary) / 0.05)"
-            stroke="rgb(var(--primary) / 0.2)"
-            strokeWidth="1"
-          />
-        </svg>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <button
-              onClick={() => handleNavClick("home")}
-              className="text-2xl font-bold text-primary hover:text-accent transition-colors duration-200"
-            >
-              WanderFare
-            </button>
-          </div>
-
-          {/* Navigation Links */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              {navItems.map((item) => (
-                <button
-                  key={item.page}
-                  onClick={() => handleNavClick(item.page)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    currentPage === item.page
-                      ? "bg-primary text-primary-foreground shadow-md transform scale-105"
-                      : "text-foreground hover:text-primary hover:bg-primary/10 hover:transform hover:scale-105"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
+    <nav className="relative z-50">
+      {/* Floating Navbar Container */}
+      <div className="absolute left-1/2 top-4 -translate-x-1/2">
+        <div className="bg-background/95 backdrop-blur-md border border-border rounded-full shadow-lg px-4 py-2 sm:px-6 sm:py-3">
+          <div className="flex items-center justify-between gap-3 sm:gap-4">
+            {/* Logo */}
+            <div className="flex-shrink-0">
+              <button
+                onClick={() => handleNavClick("home")}
+                className="text-base sm:text-lg font-bold text-primary hover:text-accent transition-colors duration-200 hover:underline hover:underline-offset-4 flex items-center gap-2"
+              >
+                <div className="w-6 h-6 sm:w-7 sm:h-7 bg-primary rounded-lg flex items-center justify-center">
+                  <span className="text-primary-foreground font-bold text-xs">WF</span>
+                </div>
+                <span className="hidden sm:block">WanderFare</span>
+              </button>
             </div>
-          </div>
 
-          {/* User Menu */}
-          {isAuthenticated && user ? (
-            <div className="hidden md:flex items-center gap-3">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        {userInitials}
-                      </AvatarFallback>
-                    </Avatar>
+            {/* Navigation Links - Desktop */}
+            <div className="hidden lg:flex items-center">
+              <div className="flex items-baseline gap-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <button
+                      key={item.page}
+                      onClick={() => handleNavClick(item.page)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                        currentPage === item.page
+                          ? "bg-primary text-primary-foreground shadow-md transform scale-105"
+                          : "text-foreground hover:text-primary hover:bg-primary/10 hover:transform hover:scale-105"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="hidden xl:block">{item.label}</span>
+                      <span className="xl:hidden">{item.label.split(' ')[0]}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Right Side - User Menu & Mobile Toggle */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Quick Actions for Role */}
+              {isAuthenticated && userRole === "CUSTOMER" && (
+                <div className="hidden xl:flex items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleNavClick("vendors")}
+                    className="hidden 2xl:flex items-center gap-2 rounded-full"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    Find Food
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user.firstName} {user.lastName}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user.email}
-                      </p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {userRole?.toLowerCase()}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => handleNavClick("profile")}>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleNavClick("profile")}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              {/* Always-visible Sign out button as a backup */}
-              <Button onClick={handleLogout} variant="outline" size="sm">
-                Sign out
-              </Button>
-            </div>
-          ) : (
-            <div className="hidden md:block">
-              <Button onClick={() => handleNavClick("login")} variant="outline" size="sm">
-                Sign In
-              </Button>
-            </div>
-          )}
-
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-foreground hover:text-primary"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-                />
-              </svg>
-            </Button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-border mt-2 bg-background/95 backdrop-blur-sm">
-              {isAuthenticated && user && (
-                <div className="flex items-center gap-2 p-3 mb-2 bg-muted rounded-md">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {userInitials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium text-sm">{user.firstName} {user.lastName}</p>
-                    <p className="text-xs text-muted-foreground">{userRole?.toLowerCase()}</p>
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleNavClick("vendors")}
+                    className="xl:flex 2xl:hidden items-center gap-2 rounded-full"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                  </Button>
                 </div>
               )}
-              
-              {navItems.map((item) => (
+
+              {isAuthenticated && userRole === "VENDOR" && (
+                <div className="hidden xl:flex items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleNavClick("price-prediction")}
+                    className="hidden 2xl:flex items-center gap-2 rounded-full"
+                  >
+                    <TrendingUp className="h-4 w-4" />
+                    Predict
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleNavClick("price-prediction")}
+                    className="xl:flex 2xl:hidden items-center gap-2 rounded-full"
+                  >
+                    <TrendingUp className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
+              {isAuthenticated && userRole === "ADMIN" && (
+                <div className="hidden xl:flex items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleNavClick("dashboard")}
+                    className="hidden 2xl:flex items-center gap-2 rounded-full"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    Analytics
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleNavClick("dashboard")}
+                    className="xl:flex 2xl:hidden items-center gap-2 rounded-full"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
+              {/* User Menu - Desktop */}
+              {isAuthenticated && user ? (
+                <div className="hidden md:flex items-center gap-2 sm:gap-3">
+                  {/* Notifications */}
+                  <Button variant="ghost" size="sm" className="relative rounded-full p-1.5">
+                    <Bell className="h-4 w-4" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  </Button>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {userInitials}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                      <div className="flex items-center justify-start gap-2 p-2">
+                        <div className="flex flex-col space-y-1 leading-none">
+                          <p className="font-medium">{user.firstName} {user.lastName}</p>
+                          <p className="w-[200px] truncate text-sm text-muted-foreground">
+                            {user.email}
+                          </p>
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {userRole?.toLowerCase()}
+                          </p>
+                        </div>
+                      </div>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleNavClick("profile")}>
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleNavClick("profile")}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Settings</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Backup Sign out button */}
+                  <Button onClick={handleLogout} variant="outline" size="sm" className="hidden xl:flex rounded-full">
+                    Sign out
+                  </Button>
+                </div>
+              ) : (
+                <div className="hidden md:flex">
+                  <Button onClick={() => handleNavClick("login")} variant="outline" size="sm" className="rounded-full px-3">
+                    Sign In
+                  </Button>
+                </div>
+              )}
+
+              {/* Mobile menu button */}
+              <div className="md:hidden">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-foreground hover:text-primary rounded-full p-1.5"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+                    />
+                  </svg>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Navigation Sheet */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="fixed top-20 left-4 right-4 bg-background/95 backdrop-blur-md border border-border rounded-2xl shadow-lg p-5">
+            {/* User Info in Mobile */}
+            {isAuthenticated && user && (
+              <div className="flex items-center gap-3 p-4 mb-4 bg-muted rounded-xl">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-medium text-sm">{user.firstName} {user.lastName}</p>
+                  <p className="text-xs text-muted-foreground">{userRole?.toLowerCase()}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Items */}
+            {navItems.map((item) => {
+              const Icon = item.icon
+              return (
                 <button
                   key={item.page}
                   onClick={() => handleNavClick(item.page)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium w-full text-left transition-all duration-200 ${
+                  className={`w-full px-5 py-3 rounded-xl text-base font-medium text-left transition-all duration-200 flex items-center gap-3 mb-3 ${
                     currentPage === item.page
                       ? "bg-primary text-primary-foreground"
                       : "text-foreground hover:text-primary hover:bg-primary/10"
                   }`}
                 >
+                  <Icon className="h-4 w-4" />
                   {item.label}
                 </button>
-              ))}
-              
-              {isAuthenticated ? (
-                <Button onClick={handleLogout} variant="outline" size="sm" className="w-full mt-2">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
+              )
+            })}
+
+            {/* Quick Actions in Mobile */}
+            {isAuthenticated && userRole === "CUSTOMER" && (
+              <div className="pt-3 border-t border-border mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleNavClick("vendors")}
+                  className="w-full justify-start mb-3 rounded-xl px-5 py-3"
+                >
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Find Food
                 </Button>
-              ) : (
-                <Button onClick={() => handleNavClick("login")} variant="outline" size="sm" className="w-full mt-2">
-                  Sign In
+              </div>
+            )}
+
+            {isAuthenticated && userRole === "VENDOR" && (
+              <div className="pt-3 border-t border-border mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleNavClick("price-prediction")}
+                  className="w-full justify-start mb-3 rounded-xl px-5 py-3"
+                >
+                  <TrendingUp className="mr-2 h-4 w-4" />
+                  Price Predictor
                 </Button>
-              )}
-            </div>
+              </div>
+            )}
+
+            {isAuthenticated && userRole === "ADMIN" && (
+              <div className="pt-3 border-t border-border mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleNavClick("dashboard")}
+                  className="w-full justify-start mb-3 rounded-xl px-5 py-3"
+                >
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  View Analytics
+                </Button>
+              </div>
+            )}
+
+            {/* Auth Actions */}
+            {isAuthenticated ? (
+              <Button onClick={handleLogout} variant="outline" size="sm" className="w-full mt-4 rounded-xl px-5 py-3">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            ) : (
+              <Button onClick={() => handleNavClick("login")} variant="outline" size="sm" className="w-full mt-4 rounded-xl px-5 py-3">
+                Sign In
+              </Button>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </nav>
   )
 }
+
+export default TopNavbar

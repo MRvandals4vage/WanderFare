@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Search, MapPin, Star, Clock, DollarSign } from "lucide-react"
+import { Loader2, Search, MapPin, Star, Clock, DollarSign, Utensils, TrendingUp } from "lucide-react"
 import { apiClient, Vendor } from "@/lib/api"
 import type { PageType } from "@/app/page"
 
@@ -54,7 +54,7 @@ export function VendorsPage({ setCurrentPage, setSelectedVendorId }: VendorsPage
       }
       
       setVendors(response.content || [])
-      setTotalPages(response.totalPages || Math.ceil((response.content?.length || 0) / 12))
+      setTotalPages((response as any)?.totalPages || Math.ceil((response.content?.length || 0) / 12))
     } catch (err: any) {
       console.error("Failed to load vendors:", err)
       setError("Failed to load vendors. Please try again.")
@@ -82,58 +82,74 @@ export function VendorsPage({ setCurrentPage, setSelectedVendorId }: VendorsPage
     return time.slice(0, 5) // Remove seconds
   }
 
+  const isPopularVendor = (vendor: Vendor) => {
+    const rating = vendor.rating || 0
+    const isVerified = vendor.isApproved
+    return rating >= 4.5 && isVerified
+  }
+
   const VendorCard = ({ vendor }: { vendor: Vendor }) => (
-    <Card className="hover:shadow-lg transition-shadow h-full">
+    <Card className="group relative overflow-hidden h-full border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1 hover:ring-foreground/10">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <CardTitle className="text-xl">{vendor.businessName}</CardTitle>
+            <CardTitle className="text-2xl font-semibold tracking-tight">{vendor.businessName}</CardTitle>
             <CardDescription className="mt-1 line-clamp-2">
               {vendor.description || "Delicious food awaits you!"}
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="bg-primary/10 text-primary ml-2">
+          <Badge variant="outline" className="ml-2 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs px-2.5 py-1">
             <Star className="w-3 h-3 mr-1" />
             {vendor.rating?.toFixed(1) || "New"}
           </Badge>
         </div>
         
-        <div className="space-y-1 text-sm text-muted-foreground">
-          <div className="flex items-center">
-            <MapPin className="w-4 h-4 mr-1" />
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <MapPin className="h-4 w-4 text-foreground/70" />
             {vendor.city}
           </div>
-          <div className="flex items-center">
-            <Clock className="w-4 h-4 mr-1" />
+          <div className="flex items-center gap-1.5">
+            <Utensils className="h-4 w-4 text-foreground/70" />
+            {vendor.cuisineType || "Mixed"}
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-4 w-4 text-foreground/70" />
             {formatTime(vendor.openingTime)} - {formatTime(vendor.closingTime)}
           </div>
-          <div className="flex items-center">
-            <DollarSign className="w-4 h-4 mr-1" />
+          <div className="flex items-center gap-1.5">
+            <DollarSign className="h-4 w-4 text-foreground/70" />
             Delivery: ${vendor.deliveryFee?.toFixed(2) || "0.00"}
           </div>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <div>
-          <Badge variant="outline" className="mb-2">
+      <CardContent className="p-6 md:p-8 space-y-6">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="outline" className="rounded-full text-xs px-2.5 py-1">
             {vendor.cuisineType || "Mixed"}
           </Badge>
           {vendor.isApproved && (
-            <Badge variant="default" className="ml-2 bg-green-100 text-green-800">
+            <Badge variant="outline" className="rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1">
               Verified
+            </Badge>
+          )}
+          {isPopularVendor(vendor) && (
+            <Badge variant="outline" className="rounded-full bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs px-2.5 py-1">
+              <TrendingUp className="h-3 w-3 mr-1" />
+              Popular
             </Badge>
           )}
         </div>
 
-        <div className="flex gap-2 pt-2">
-          <Button className="flex-1" onClick={() => {
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <Button className="sm:w-auto w-full" onClick={() => {
             setSelectedVendorId(vendor.id)
             setCurrentPage("vendor-menu")
           }}>
             View Menu
           </Button>
-          <Button variant="outline" className="flex-1" onClick={() => {
+          <Button variant="outline" className="sm:w-auto w-full" onClick={() => {
             // TODO: Navigate to vendor reviews
             console.log("View reviews for vendor:", vendor.id)
           }}>
@@ -147,8 +163,8 @@ export function VendorsPage({ setCurrentPage, setSelectedVendorId }: VendorsPage
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">Discover Vendors</h1>
+        <div className="mb-8 md:mb-10">
+          <h1 className="text-4xl font-bold text-foreground mb-4 text-balance">Discover Vendors</h1>
           <p className="text-xl text-muted-foreground">
             Find amazing food vendors and explore authentic culinary experiences
           </p>
@@ -231,7 +247,7 @@ export function VendorsPage({ setCurrentPage, setSelectedVendorId }: VendorsPage
         {/* Vendors Grid */}
         {!loading && vendors.length > 0 && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
               {vendors.map((vendor) => (
                 <VendorCard key={vendor.id} vendor={vendor} />
               ))}

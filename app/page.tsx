@@ -1,7 +1,7 @@
 "use client"
 
 import { useAuth } from "@/components/auth-provider"
-import { Navbar } from "@/components/navbar"
+import Navbar from "@/components/navbar"
 import { HomePage } from "@/components/pages/home-page"
 import { LoginPage } from "@/components/pages/login-page"
 import { VendorsPage } from "@/components/pages/vendors-page"
@@ -42,7 +42,7 @@ export default function App() {
   const renderPage = () => {
     switch (currentPage) {
       case "home":
-        return <HomePage />
+        return <HomePage setCurrentPage={setCurrentPage} />
       case "login":
         return <LoginPage />
       case "vendors":
@@ -68,14 +68,16 @@ export default function App() {
       case "manage-customers":
         return <ManageCustomersPage />
       default:
-        return <HomePage />
+        return <HomePage setCurrentPage={setCurrentPage} />
     }
   }
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      <main className="transition-all duration-300 ease-in-out">{renderPage()}</main>
+      <main className="transition-all duration-300 ease-in-out pt-16">
+        {renderPage()}
+      </main>
       <footer className="bg-muted border-t border-border py-8 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">

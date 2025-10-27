@@ -20,7 +20,7 @@ export function HomePage({ setCurrentPage }: HomePageProps) {
 
   const handleExploreVendors = () => {
     if (setCurrentPage) {
-      if (userRole === "customer") {
+      if (userRole === "CUSTOMER") {
         setCurrentPage("vendors")
       } else {
         setCurrentPage("login")
@@ -31,9 +31,9 @@ export function HomePage({ setCurrentPage }: HomePageProps) {
   return (
     <div className="min-h-screen">
       {/* Hero Section with Video Background */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden pt-16">
         {/* Background Image */}
-        <div 
+        <div
           className="absolute inset-0 w-full h-full bg-cover bg-center"
           style={{ backgroundImage: 'url(/bustling-food-market-with-vendors-cooking.jpg)' }}
         />

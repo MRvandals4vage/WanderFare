@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, ShoppingCart, Plus, Minus, ArrowLeft, Star, MapPin, Clock } from "lucide-react"
+import { Loader2, ShoppingCart, Plus, Minus, ArrowLeft, Star, MapPin, Clock, Utensils } from "lucide-react"
 import { apiClient, Vendor, MenuItem } from "@/lib/api"
 import type { PageType } from "@/app/page"
 
@@ -193,32 +193,35 @@ export function VendorMenuPage({ vendorId, setCurrentPage }: VendorMenuPageProps
         </Button>
 
         {/* Vendor Header */}
-        <Card className="mb-6">
-          <CardHeader>
+        <Card className="mb-6 group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1 hover:ring-foreground/10">
+          <CardHeader className="p-6 md:p-8">
             <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-3xl">{vendor.businessName}</CardTitle>
+              <div className="flex-1">
+                <CardTitle className="text-3xl font-semibold tracking-tight">{vendor.businessName}</CardTitle>
                 <CardDescription className="mt-2 text-base">
                   {vendor.description}
                 </CardDescription>
               </div>
-              <Badge variant="secondary" className="bg-primary/10 text-primary">
+              <Badge variant="secondary" className="ml-4 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs px-2.5 py-1">
                 <Star className="w-4 h-4 mr-1" />
                 {vendor.rating?.toFixed(1) || "New"}
               </Badge>
             </div>
-            <div className="flex flex-wrap gap-4 mt-4 text-sm text-muted-foreground">
-              <div className="flex items-center">
-                <MapPin className="w-4 h-4 mr-1" />
+            <div className="flex flex-wrap gap-3 mt-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="h-4 w-4 text-foreground/70" />
                 {vendor.city}
               </div>
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-1" />
+              <div className="flex items-center gap-1.5">
+                <Clock className="h-4 w-4 text-foreground/70" />
                 {vendor.openingTime?.slice(0, 5)} - {vendor.closingTime?.slice(0, 5)}
               </div>
-              <Badge variant="outline">{vendor.cuisineType}</Badge>
+              <Badge variant="outline" className="rounded-full text-xs px-2.5 py-1">
+                <Utensils className="h-3 w-3 mr-1" />
+                {vendor.cuisineType}
+              </Badge>
             </div>
-            <div className="mt-2 text-sm">
+            <div className="mt-3 text-sm">
               <span className="font-medium">Delivery Fee:</span> ${vendor.deliveryFee?.toFixed(2) || "0.00"}
               {vendor.minimumOrder && vendor.minimumOrder > 0 && (
                 <span className="ml-4">
@@ -236,8 +239,8 @@ export function VendorMenuPage({ vendorId, setCurrentPage }: VendorMenuPageProps
         )}
 
         {success && (
-          <Alert className="mb-6 bg-green-50 border-green-200">
-            <AlertDescription className="text-green-800">{success}</AlertDescription>
+          <Alert className="mb-6 bg-emerald-50 border-emerald-200 rounded-lg border">
+            <AlertDescription className="text-emerald-800">{success}</AlertDescription>
           </Alert>
         )}
 
@@ -245,13 +248,14 @@ export function VendorMenuPage({ vendorId, setCurrentPage }: VendorMenuPageProps
           {/* Menu Items */}
           <div className="lg:col-span-2 space-y-6">
             {/* Search and Filter */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="space-y-4">
+            <Card className="group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:shadow-md hover:ring-1 hover:ring-foreground/10">
+              <CardContent className="pt-6 p-6 md:p-8">
+                <div className="space-y-6">
                   <Input
                     placeholder="Search menu items..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    className="text-base"
                   />
                   <div className="flex gap-2 flex-wrap">
                     {categories.map(category => (
@@ -260,6 +264,7 @@ export function VendorMenuPage({ vendorId, setCurrentPage }: VendorMenuPageProps
                         variant={selectedCategory === category ? "default" : "outline"}
                         size="sm"
                         onClick={() => setSelectedCategory(category)}
+                        className="rounded-full text-xs px-3 py-1.5"
                       >
                         {category === "all" ? "All" : category}
                       </Button>
@@ -270,29 +275,43 @@ export function VendorMenuPage({ vendorId, setCurrentPage }: VendorMenuPageProps
             </Card>
 
             {/* Menu Items Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredItems.map(item => (
-                <Card key={item.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
+                <Card key={item.id} className="group relative overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-1 hover:ring-foreground/10">
+                  <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <CardTitle className="text-lg">{item.name}</CardTitle>
-                        <CardDescription className="mt-1 line-clamp-2">
+                        <CardTitle className="text-lg font-semibold tracking-tight">{item.name}</CardTitle>
+                        <CardDescription className="mt-1 line-clamp-2 text-sm">
                           {item.description}
                         </CardDescription>
                       </div>
-                      <span className="text-lg font-bold text-primary ml-2">
+                      <span className="text-xl font-bold text-primary ml-2">
                         ${item.price.toFixed(2)}
                       </span>
                     </div>
-                    <div className="flex gap-2 mt-2 flex-wrap">
-                      <Badge variant="outline">{item.category}</Badge>
-                      {item.isVegetarian && <Badge variant="secondary">Vegetarian</Badge>}
-                      {item.isVegan && <Badge variant="secondary">Vegan</Badge>}
-                      {item.isGlutenFree && <Badge variant="secondary">Gluten Free</Badge>}
+                    <div className="flex gap-2 mt-3 flex-wrap">
+                      <Badge variant="outline" className="rounded-full text-xs px-2.5 py-1">
+                        {item.category}
+                      </Badge>
+                      {item.isVegetarian && (
+                        <Badge variant="outline" className="rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1">
+                          Vegetarian
+                        </Badge>
+                      )}
+                      {item.isVegan && (
+                        <Badge variant="outline" className="rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1">
+                          Vegan
+                        </Badge>
+                      )}
+                      {item.isGlutenFree && (
+                        <Badge variant="outline" className="rounded-full bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs px-2.5 py-1">
+                          Gluten Free
+                        </Badge>
+                      )}
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-0">
                     <Button
                       onClick={() => addToCart(item)}
                       className="w-full"
@@ -317,14 +336,14 @@ export function VendorMenuPage({ vendorId, setCurrentPage }: VendorMenuPageProps
 
           {/* Cart */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-20">
-              <CardHeader>
-                <CardTitle className="flex items-center">
+            <Card className="sticky top-20 group overflow-hidden border bg-background/60 backdrop-blur supports-[backdrop-filter]:bg-background/40 transition-all duration-200 hover:shadow-md hover:ring-1 hover:ring-foreground/10">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-lg font-semibold">
                   <ShoppingCart className="w-5 h-5 mr-2" />
                   Your Cart ({cart.length})
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="p-6 md:p-8 space-y-4">
                 {cart.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
                     Your cart is empty
