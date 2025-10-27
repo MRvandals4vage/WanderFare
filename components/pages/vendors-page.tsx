@@ -130,12 +130,12 @@ export function VendorsPage({ setCurrentPage, setSelectedVendorId }: VendorsPage
             {vendor.cuisineType || "Mixed"}
           </Badge>
           {vendor.isApproved && (
-            <Badge variant="outline" className="rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1">
+            <Badge variant="outline" className="rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1">
               Verified
             </Badge>
           )}
           {isPopularVendor(vendor) && (
-            <Badge variant="outline" className="rounded-full bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs px-2.5 py-1">
+            <Badge variant="outline" className="rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1">
               <TrendingUp className="h-3 w-3 mr-1" />
               Popular
             </Badge>
@@ -161,7 +161,7 @@ export function VendorsPage({ setCurrentPage, setSelectedVendorId }: VendorsPage
   )
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <div className="min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 md:mb-10">
           <h1 className="text-4xl font-bold text-foreground mb-4 text-balance">Discover Vendors</h1>

@@ -31,7 +31,7 @@ export function HomePage({ setCurrentPage }: HomePageProps) {
   return (
     <div className="min-h-screen">
       {/* Hero Section with Video Background */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden pt-16">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center"
@@ -54,29 +54,17 @@ export function HomePage({ setCurrentPage }: HomePageProps) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {!userRole ? (
               <>
-                <Button
-                  size="lg"
-                  className="text-lg px-8 py-4 bg-primary hover:bg-accent transition-all duration-300 transform hover:scale-105"
-                  onClick={handleGetStarted}
-                >
+                <button className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
                   Get Started
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-foreground bg-transparent transition-all duration-300 transform hover:scale-105"
-                  onClick={handleExploreVendors}
-                >
+                </button>
+                <button className="px-6 py-3 rounded-full border border-white/80 text-white font-medium hover:bg-white/10 transition-all duration-300 transform hover:scale-105">
                   Explore Vendors
-                </Button>
+                </button>
               </>
             ) : (
-              <Button
-                size="lg"
-                className="text-lg px-8 py-4 bg-primary hover:bg-accent transition-all duration-300 transform hover:scale-105"
-              >
+              <button className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all duration-300 transform hover:scale-105">
                 Welcome back, {userRole}!
-              </Button>
+              </button>
             )}
           </div>
         </div>
@@ -198,16 +186,12 @@ export function HomePage({ setCurrentPage }: HomePageProps) {
             Join thousands of food lovers and vendors who are already part of the WanderFare community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
+            <button className="px-6 py-3 rounded-full bg-primary-foreground text-primary font-medium hover:bg-primary-foreground/90 transition-all duration-300 transform hover:scale-105">
               Join as Customer
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-lg px-8 py-4 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary bg-transparent"
-            >
+            </button>
+            <button className="px-6 py-3 rounded-full border border-primary-foreground/80 text-primary-foreground font-medium hover:bg-primary-foreground/10 transition-all duration-300 transform hover:scale-105">
               Become a Vendor
-            </Button>
+            </button>
           </div>
         </div>
       </section>

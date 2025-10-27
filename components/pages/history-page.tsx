@@ -13,17 +13,17 @@ const getStatusColor = (status?: string) => {
   const s = (status ?? "PENDING").toUpperCase()
   switch (s) {
     case "DELIVERED":
-      return "rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1"
+      return "rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1"
     case "PREPARING":
-      return "rounded-full bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs px-2.5 py-1"
+      return "rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1"
     case "OUT_FOR_DELIVERY":
-      return "rounded-full bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs px-2.5 py-1"
+      return "rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1"
     case "PENDING":
-      return "rounded-full bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs px-2.5 py-1"
+      return "rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1"
     case "CANCELLED":
-      return "rounded-full bg-red-500/10 text-red-600 border-red-500/20 text-xs px-2.5 py-1"
+      return "rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1"
     default:
-      return "rounded-full bg-gray-500/10 text-gray-600 border-gray-500/20 text-xs px-2.5 py-1"
+      return "rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1"
   }
 }
 
@@ -256,8 +256,8 @@ export function HistoryPage() {
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className={
                           order.paymentStatus === "PAID" ?
-                            "rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1" :
-                            "rounded-full bg-amber-500/10 text-amber-600 border-amber-500/20 text-xs px-2.5 py-1"
+                            "rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1" :
+                            "rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1"
                         }>
                           {order.paymentStatus}
                         </Badge>

@@ -239,8 +239,8 @@ export function VendorMenuPage({ vendorId, setCurrentPage }: VendorMenuPageProps
         )}
 
         {success && (
-          <Alert className="mb-6 bg-emerald-50 border-emerald-200 rounded-lg border">
-            <AlertDescription className="text-emerald-800">{success}</AlertDescription>
+          <Alert className="mb-6 bg-[oklch(0.75_0.03_45)] border-[oklch(0.75_0.03_45)] rounded-lg border">
+            <AlertDescription className="text-[oklch(0.15_0.01_30)]">{success}</AlertDescription>
           </Alert>
         )}
 
@@ -295,17 +295,17 @@ export function VendorMenuPage({ vendorId, setCurrentPage }: VendorMenuPageProps
                         {item.category}
                       </Badge>
                       {item.isVegetarian && (
-                        <Badge variant="outline" className="rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1">
+                        <Badge variant="outline" className="rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1">
                           Vegetarian
                         </Badge>
                       )}
                       {item.isVegan && (
-                        <Badge variant="outline" className="rounded-full bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs px-2.5 py-1">
+                        <Badge variant="outline" className="rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1">
                           Vegan
                         </Badge>
                       )}
                       {item.isGlutenFree && (
-                        <Badge variant="outline" className="rounded-full bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs px-2.5 py-1">
+                        <Badge variant="outline" className="rounded-full bg-[oklch(0.75_0.03_45)] text-[oklch(0.15_0.01_30)] border-[oklch(0.75_0.03_45)] text-xs px-2.5 py-1">
                           Gluten Free
                         </Badge>
                       )}

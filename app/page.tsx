@@ -75,7 +75,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      <main className="transition-all duration-300 ease-in-out pt-16">
+      <main className="transition-all duration-300 ease-in-out">
         {renderPage()}
       </main>
       <footer className="bg-muted border-t border-border py-8 mt-16">
@@ -84,7 +84,7 @@ export default function App() {
             <h3 className="text-2xl font-bold text-primary mb-2">WanderFare</h3>
             <p className="text-muted-foreground mb-4">Connecting food lovers with amazing vendors</p>
             <p className="text-sm text-muted-foreground">
-              © 2024 WanderFare. Built with React, TypeScript, and TailwindCSS.
+              2024 WanderFare. Built with React, TypeScript, and TailwindCSS.
             </p>
           </div>
         </div>

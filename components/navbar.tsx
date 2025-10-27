@@ -91,8 +91,8 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
     <nav className="relative z-50">
       {/* Floating Navbar Container */}
       <div className="absolute left-1/2 top-4 -translate-x-1/2">
-        <div className="bg-background/95 backdrop-blur-md border border-border rounded-full shadow-lg px-4 py-2 sm:px-6 sm:py-3">
-          <div className="flex items-center justify-between gap-3 sm:gap-4">
+        <div className="bg-background/60 backdrop-blur-md border border-border/30 rounded-full shadow-lg px-3 py-2 sm:px-4 sm:py-2">
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
             {/* Logo */}
             <div className="flex-shrink-0">
               <button
@@ -115,7 +115,7 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
                     <button
                       key={item.page}
                       onClick={() => handleNavClick(item.page)}
-                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                      className={`px-2.5 py-1 rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
                         currentPage === item.page
                           ? "bg-primary text-primary-foreground shadow-md transform scale-105"
                           : "text-foreground hover:text-primary hover:bg-primary/10 hover:transform hover:scale-105"
@@ -131,7 +131,7 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
             </div>
 
             {/* Right Side - User Menu & Mobile Toggle */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-2">
               {/* Quick Actions for Role */}
               {isAuthenticated && userRole === "CUSTOMER" && (
                 <div className="hidden xl:flex items-center">
@@ -201,9 +201,9 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
 
               {/* User Menu - Desktop */}
               {isAuthenticated && user ? (
-                <div className="hidden md:flex items-center gap-2 sm:gap-3">
+                <div className="hidden md:flex items-center gap-2 sm:gap-2">
                   {/* Notifications */}
-                  <Button variant="ghost" size="sm" className="relative rounded-full p-1.5">
+                  <Button variant="ghost" size="sm" className="relative rounded-full p-1">
                     <Bell className="h-4 w-4" />
                     <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   </Button>
@@ -265,7 +265,7 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-foreground hover:text-primary rounded-full p-1.5"
+                  className="text-foreground hover:text-primary rounded-full p-1"
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -286,11 +286,11 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
       {/* Mobile Navigation Sheet */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-          <div className="fixed top-20 left-4 right-4 bg-background/95 backdrop-blur-md border border-border rounded-2xl shadow-lg p-5">
+          <div className="fixed inset-0 bg-background/40 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="fixed top-18 left-4 right-4 bg-background/60 backdrop-blur-md border border-border/30 rounded-2xl shadow-lg p-4">
             {/* User Info in Mobile */}
             {isAuthenticated && user && (
-              <div className="flex items-center gap-3 p-4 mb-4 bg-muted rounded-xl">
+              <div className="flex items-center gap-3 p-3 mb-3 bg-muted/60 rounded-xl">
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-primary text-primary-foreground">
                     {userInitials}
@@ -310,7 +310,7 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
                 <button
                   key={item.page}
                   onClick={() => handleNavClick(item.page)}
-                  className={`w-full px-5 py-3 rounded-xl text-base font-medium text-left transition-all duration-200 flex items-center gap-3 mb-3 ${
+                  className={`w-full px-4 py-2.5 rounded-xl text-base font-medium text-left transition-all duration-200 flex items-center gap-3 mb-2 ${
                     currentPage === item.page
                       ? "bg-primary text-primary-foreground"
                       : "text-foreground hover:text-primary hover:bg-primary/10"
@@ -329,7 +329,7 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => handleNavClick("vendors")}
-                  className="w-full justify-start mb-3 rounded-xl px-5 py-3"
+                  className="w-full justify-start mb-2 rounded-xl px-4 py-2.5"
                 >
                   <ShoppingBag className="mr-2 h-4 w-4" />
                   Find Food
@@ -343,7 +343,7 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => handleNavClick("price-prediction")}
-                  className="w-full justify-start mb-3 rounded-xl px-5 py-3"
+                  className="w-full justify-start mb-2 rounded-xl px-4 py-2.5"
                 >
                   <TrendingUp className="mr-2 h-4 w-4" />
                   Price Predictor
@@ -357,7 +357,7 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => handleNavClick("dashboard")}
-                  className="w-full justify-start mb-3 rounded-xl px-5 py-3"
+                  className="w-full justify-start mb-2 rounded-xl px-4 py-2.5"
                 >
                   <BarChart3 className="mr-2 h-4 w-4" />
                   View Analytics
@@ -367,12 +367,12 @@ function TopNavbar({ currentPage, setCurrentPage }: TopNavbarProps) {
 
             {/* Auth Actions */}
             {isAuthenticated ? (
-              <Button onClick={handleLogout} variant="outline" size="sm" className="w-full mt-4 rounded-xl px-5 py-3">
+              <Button onClick={handleLogout} variant="outline" size="sm" className="w-full mt-3 rounded-xl px-4 py-2.5">
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </Button>
             ) : (
-              <Button onClick={() => handleNavClick("login")} variant="outline" size="sm" className="w-full mt-4 rounded-xl px-5 py-3">
+              <Button onClick={() => handleNavClick("login")} variant="outline" size="sm" className="w-full mt-3 rounded-xl px-4 py-2.5">
                 Sign In
               </Button>
             )}
