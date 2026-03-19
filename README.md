@@ -241,11 +241,6 @@ docker run -p 8080:8080 -e DATABASE_URL=your-db-url wanderfare-backend
 # Deploy to Railway
 railway up
 
-# Deploy to Heroku
-heroku create wanderfare-backend
-git push heroku main
-```
-
 ### Frontend Deployment
 
 #### Option 1: Vercel (Recommended)
